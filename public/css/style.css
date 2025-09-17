@@ -1,0 +1,33 @@
+/* Estilos para notificaciones */
+.notificacion-toast {
+    min-width: 300px;
+}
+
+.toast-body {
+    background-color: #f8f9fa;
+}
+
+#notificaciones-badge {
+    font-size: 0.7em;
+    padding: 0.25em 0.5em;
+}
+
+/* Animación para nuevas notificaciones */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.pulse {
+    animation: pulse 0.5s ease-in-out;
+}
+.hover-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    cursor: pointer;
+}
