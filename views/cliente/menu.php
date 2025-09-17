@@ -1,7 +1,7 @@
 <div class="container py-5">
     <div class="text-center mb-5">
         <h1 class="fw-bold">
-            <i class="bi bi-cup-hot-fill text-primary"></i> Menú de Productos
+            <i class="fa-solid fa-mug-hot"></i> SABORES Y MOMENTOS (Menú)
         </h1>
         <p class="text-muted">Explora nuestra selección y ordena lo que más te guste</p>
     </div>
@@ -25,7 +25,7 @@
         <div class="col-md-4">
             <div class="card h-100 shadow-sm border-0 rounded-3 product-card">
                 <img src="<?php echo BASE_URL; ?>img/<?php echo $producto['id']; ?>.jpg"
-
+ 
                      class="card-img-top rounded-top" 
                      alt="<?php echo $producto['nombre']; ?>"
                      style="height: 220px; object-fit: cover;">
