@@ -8,7 +8,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);
+            background: linear-gradient(135deg, rgba(251,194,235,0.7) 0%, rgba(166,193,238,0.7) 100%),
+                        url("https://i.pinimg.com/originals/07/5a/de/075ade028580e551fc227649650c79d2.gif");
+            background-size: cover;       /* La imagen cubre toda la pantalla */
+            background-position: center;  /* Centra la imagen */
+            background-repeat: no-repeat; /* No se repite */
+            background-attachment: fixed; /* Fondo fijo aunque hagas scroll */
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -17,15 +22,15 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .login-card {
-            max-width: 420px; /* ancho máximo fijo */
-            width: 100%;      /* ocupa el ancho disponible */
+            max-width: 420px;
+            width: 100%;
             border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
             overflow: hidden;
             background: #fff;
         }
         .card-header {
-            background: linear-gradient(90deg, #ff5e62 0%, #ff9966 100%);
+            background: linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%);
             color: white;
             text-align: center;
             padding: 25px;
@@ -35,7 +40,7 @@
             letter-spacing: 1px;
         }
         .btn-primary {
-            background: linear-gradient(90deg, #ff5e62 0%, #ff9966 100%);
+            background: linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%);
             border: none;
             border-radius: 50px;
             padding: 12px;
@@ -54,18 +59,18 @@
             font-size: 15px;
         }
         .form-control:focus {
-            border-color: #ff5e62;
-            box-shadow: 0 0 0 0.25rem rgba(255, 94, 98, 0.25);
+            border-color: #a18cd1;
+            box-shadow: 0 0 0 0.25rem rgba(161, 140, 209, 0.25);
         }
         .login-link {
-            color: #ff5e62;
+            color: #a18cd1;
             font-weight: 600;
             text-decoration: none;
             transition: 0.3s;
         }
         .login-link:hover {
             text-decoration: underline;
-            color: #e94e54;
+            color: #845ec2;
         }
         .password-toggle {
             cursor: pointer;
@@ -86,7 +91,7 @@
         }
         .text-center h6 {
             font-weight: bold;
-            color: #444;
+            color: #555;
         }
         .footer {
             color: #fff;

@@ -23,18 +23,18 @@ class ClienteController extends BaseController {
     
 public function pedido() {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        // Procesar pedido
         $productos = json_decode($_POST['productos'], true);
         $tipo = $_POST['tipo'];
+        $nombreCliente = $_POST['nombre_cliente'] ?? null; // ← nuevo
 
-        // Calcular total
         $total = 0;
         foreach ($productos as $producto) {
             $total += $producto['precio'] * $producto['cantidad'];
         }
 
         $datosPedido = [
-            'cliente_id' => null, // Cliente no registrado
+            'cliente_id' => null,
+            'nombre_cliente' => $nombreCliente, // ← guardamos el nombre
             'tipo' => $tipo,
             'total' => $total,
             'productos' => $productos
@@ -44,9 +44,11 @@ public function pedido() {
         $pedido_id = $pedidoModel->crearPedido($datosPedido);
 
         if ($pedido_id) {
-            // Crear notificación
             $notificacionModel = $this->model('NotificacionModel');
             $mensaje = "Nuevo pedido #{$pedido_id} - {$tipo} - Total: $" . number_format($total, 2);
+            if ($nombreCliente) {
+                $mensaje .= " - Cliente: {$nombreCliente}";
+            }
             $notificacionModel->crear('nuevo_pedido', 'mesero', $mensaje, $pedido_id);
 
             $_SESSION['pedido_id'] = $pedido_id;
@@ -55,9 +57,7 @@ public function pedido() {
             $_SESSION['error'] = 'Error al crear el pedido';
             $this->redirect('cliente/pedido');
         }
-
     } else {
-        // Mostrar vista de pedido
         $producto = $this->model('ProductoModel');
         $productos = $producto->obtenerProductos();
 
@@ -69,7 +69,6 @@ public function pedido() {
         $this->view('cliente/pedido', $data);
     }
 }
-
     
     public function comprobante($id) {
         $pedidoModel = $this->model('PedidoModel');

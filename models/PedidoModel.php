@@ -10,44 +10,33 @@ class PedidoModel {
         $this->db = $database->getConnection();
     }
 
-    public function crearPedido($datos) {
-        try {
-            $this->db->beginTransaction();
+    public function crearPedido($data) {
+    $db = $this->db;
 
-            // Crear pedido
-            $query = "INSERT INTO pedidos (codigo, cliente_id, tipo, estado, total) 
-                     VALUES (:codigo, :cliente_id, :tipo, :estado, :total)";
-            $stmt = $this->db->prepare($query);
-            
-            $codigo = 'PED' . date('YmdHis') . rand(100, 999);
-            $cliente_id = $datos['cliente_id'] ?? null;
-            $tipo = $datos['tipo'];
-            $estado = 'creado';
-            $total = $datos['total'];
+    $stmt = $db->prepare("INSERT INTO pedidos (cliente_id, nombre_cliente, tipo, total, estado) 
+                          VALUES (:cliente_id, :nombre_cliente, :tipo, :total, 'creado')");
+    $stmt->bindParam(':cliente_id', $data['cliente_id']);
+    $stmt->bindParam(':nombre_cliente', $data['nombre_cliente']);
+    $stmt->bindParam(':tipo', $data['tipo']);
+    $stmt->bindParam(':total', $data['total']);
+    $stmt->execute();
 
-            $stmt->bindParam(":codigo", $codigo);
-            $stmt->bindParam(":cliente_id", $cliente_id);
-            $stmt->bindParam(":tipo", $tipo);
-            $stmt->bindParam(":estado", $estado);
-            $stmt->bindParam(":total", $total);
-            
-            $stmt->execute();
-            $pedido_id = $this->db->lastInsertId();
+    $pedido_id = $db->lastInsertId();
 
-            // Crear detalles del pedido
-            foreach ($datos['productos'] as $producto) {
-                $this->agregarDetallePedido($pedido_id, $producto['id'], $producto['cantidad'], $producto['precio']);
-            }
-
-            $this->db->commit();
-            return $pedido_id;
-
-        } catch(PDOException $exception) {
-            $this->db->rollBack();
-            error_log("Error al crear pedido: " . $exception->getMessage());
-            return false;
-        }
+    // Insertar productos en detalle_pedido
+    foreach ($data['productos'] as $producto) {
+        $stmtDetalle = $db->prepare("INSERT INTO detalle_pedido (pedido_id, producto_id, cantidad, precio_unit) 
+                                     VALUES (:pedido_id, :producto_id, :cantidad, :precio_unit)");
+        $stmtDetalle->bindParam(':pedido_id', $pedido_id);
+        $stmtDetalle->bindParam(':producto_id', $producto['id']);
+        $stmtDetalle->bindParam(':cantidad', $producto['cantidad']);
+        $stmtDetalle->bindParam(':precio_unit', $producto['precio']);
+        $stmtDetalle->execute();
     }
+
+    return $pedido_id;
+}
+
 
     private function agregarDetallePedido($pedido_id, $producto_id, $cantidad, $precio) {
         $query = "INSERT INTO detalle_pedido (pedido_id, producto_id, cantidad, precio_unit) 

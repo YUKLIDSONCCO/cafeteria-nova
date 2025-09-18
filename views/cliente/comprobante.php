@@ -7,7 +7,9 @@
             </div>
             <div class="card-body">
                 <div class="text-center mb-4">
-                    <h4>N° Pedido: <?php echo $pedido['codigo']; ?></h4>
+                    <h4>
+                        N° Pedido: <?php echo "NV-" . str_pad($pedido['id'], 4, "0", STR_PAD_LEFT); ?>
+                    </h4>
                     <p class="text-muted"><?php echo date('d/m/Y H:i', strtotime($pedido['creado_en'])); ?></p>
                 </div>
                 
@@ -41,6 +43,12 @@
                 
                 <div class="alert alert-info">
                     <strong>Tipo:</strong> <?php echo ucfirst($pedido['tipo']); ?><br>
+                    
+                    <!-- 🔹 Nombre del cliente (solo si existe) -->
+                    <?php if (!empty($pedido['nombre_cliente'])): ?>
+                        <strong>Cliente:</strong> <?php echo htmlspecialchars($pedido['nombre_cliente']); ?><br>
+                    <?php endif; ?>
+
                     <strong>Estado:</strong> <span class="badge bg-warning"><?php echo ucfirst($pedido['estado']); ?></span>
                 </div>
                 
