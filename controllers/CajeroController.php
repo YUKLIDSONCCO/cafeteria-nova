@@ -59,5 +59,35 @@ class CajeroController extends BaseController {
         
         $this->view('cajero/cierre_caja', $data);
     }
+    
+    public function reportes() {
+        $pedidoModel = $this->model('PedidoModel');
+        $pagoModel = $this->model('PagoModel');
+        $fecha_inicio = $_GET['inicio'] ?? date('Y-m-01');
+        $fecha_fin = $_GET['fin'] ?? date('Y-m-d');
+        $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
+        $total = $pagoModel->obtenerTotalHoy();
+        $this->view('cajero/reportes', [
+            'reporte' => $reporte,
+            'total' => $total,
+            'fecha_inicio' => $fecha_inicio,
+            'fecha_fin' => $fecha_fin
+        ]);
+    }
+    // Cambiar estado de pago del pedido
+    public function togglePago() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $pedido_id = $_POST['pedido_id'];
+            $estado_actual = $_POST['estado_actual'];
+            $pedidoModel = $this->model('PedidoModel');
+            $nuevo_estado = ($estado_actual === 'pagado') ? 'no pagado' : 'pagado';
+            if ($pedidoModel->actualizarEstado($pedido_id, $nuevo_estado)) {
+                $_SESSION['success'] = 'Estado de pago actualizado.';
+            } else {
+                $_SESSION['error'] = 'No se pudo actualizar el estado.';
+            }
+        }
+        $this->redirect('cajero/dashboard');
+    }
 }
 ?>
