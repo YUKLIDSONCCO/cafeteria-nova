@@ -177,5 +177,11 @@ public function obtenerReporteVentas($fecha_inicio, $fecha_fin) {
         return [];
     }
 }
+public function actualizarMesa($pedido_id, $mesa_id) {
+    $sql = "UPDATE pedidos SET mesa_id = ? WHERE id = ?";
+    $stmt = $this->db->prepare($sql);
+    return $stmt->execute([$mesa_id, $pedido_id]);
+}
+
 }
 ?>

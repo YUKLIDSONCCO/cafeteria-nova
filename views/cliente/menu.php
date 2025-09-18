@@ -52,8 +52,23 @@
     transform: translateY(-5px);
     box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
+
+.product-card {
+    cursor: pointer;
+}
 </style>
-<!-- Scripts adicionales -->
+
 <script>
-// Aquí puedes agregar scripts específicos para esta vista si es necesario
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.addEventListener('click', function() {
+            // Simula el click al botón de "Ordenar Ahora"
+            const btn = this.querySelector('a.btn');
+            if (btn) {
+                window.location.href = btn.href;
+            }
+        });
+    });
+});
 </script>
+
