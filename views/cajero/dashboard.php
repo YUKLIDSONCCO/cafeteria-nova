@@ -96,12 +96,20 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
             border-radius: 8px;
             box-shadow: 0 2px 6px rgba(140, 23, 236, 0.1);
             margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
         }
         
         .card-header {
             background-color: var(--primary-color);
             color: white;
             border-radius: 8px 8px 0 0 !important;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .btn-primary {
@@ -127,6 +135,11 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
             border-left: 4px solid var(--accent-color);
             padding-left: 15px;
             margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        
+        .order-item:hover {
+            background-color: rgba(255, 87, 34, 0.05);
         }
         
         .notification-badge {
@@ -158,54 +171,41 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
             background-color: rgba(78, 52, 46, 0.05);
         }
         
-        .menu-badge {
-            font-size: 0.75rem;
-            padding: 0.35em 0.65em;
+        .notification-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1100;
+            min-width: 250px;
         }
         
-        .badge-cafe {
-            background-color: var(--primary-color);
+        .refresh-btn {
+            cursor: pointer;
+            transition: transform 0.5s;
         }
         
-        .badge-te {
-            background-color: var(--matcha-green);
-            color: black;
+        .refresh-btn:hover {
+            transform: rotate(180deg);
         }
         
-        .badge-ade {
-            background-color: var(--ade-blue);
-            color: black;
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
         }
         
-        .badge-smoothie {
-            background-color: var(--smoothie-yellow);
-            color: black;
+        .pulse {
+            animation: pulse 1.5s infinite;
         }
         
-        .category-title {
-            border-left: 4px solid;
-            padding-left: 10px;
-            margin: 20px 0 10px;
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
         
-        .category-cafe {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-        
-        .category-te {
-            border-color: var(--matcha-green);
-            color: var(--matcha-green);
-        }
-        
-        .category-ade {
-            border-color: var(--ade-blue);
-            color: var(--ade-blue);
-        }
-        
-        .category-smoothie {
-            border-color: var(--smoothie-yellow);
-            color: #f57f17;
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -225,17 +225,17 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="<?php echo BASE_URL; ?>cajero/pagos">
                             <i class="fas fa-cash-register"></i> Procesar Pagos
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="<?php echo BASE_URL; ?>cajero/reportes">
                             <i class="fas fa-chart-bar"></i> Reportes
                         </a>
                     </li>
                     <li class="nav-item mt-4">
-                            <a class="nav-link" href="<?php echo BASE_URL; ?>auth/logout">
+                        <a class="nav-link" href="<?php echo BASE_URL; ?>auth/logout">
                             <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                         </a>
                     </li>
@@ -246,24 +246,24 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
             <div class="col-md-9 col-lg-10 main-content">
                 <!-- Mensaje de bienvenida siempre visible arriba -->
                 <div class="header sticky-top bg-white" style="z-index: 1050; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
-                    <h4 class="mb-0">Bienvenido, <span class="text-primary">CAJERO</span></h4>
+                    <h4 class="mb-0">Bienvenido, <span class="text-primary"><?php echo $_SESSION['usuario_nombre'] ?? 'CAJERO'; ?></span></h4>
                     <div class="d-flex align-items-center">
                         <div class="me-3 position-relative">
                             <i class="fas fa-bell fa-lg text-muted"></i>
-                            <span class="notification-badge">5</span>
+                            <span class="notification-badge" id="notification-count">0</span>
                         </div>
-                        <img src="https://ui-avatars.com/api/?name=Cajero&background=4e342e&color=fff" class="rounded-circle" width="40" height="40" alt="Usuario">
+                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['usuario_nombre'] ?? 'Cajero'); ?>&background=4e342e&color=fff" class="rounded-circle" width="40" height="40" alt="Usuario">
                     </div>
                 </div>
 
                 <div class="row">
                     <!-- Resumen de Estado (KPIs) -->
                     <div class="col-md-6 col-lg-3">
-                        <div class="card text-center">
+                        <div class="card text-center pulse" id="card-pendientes">
                             <div class="card-body">
                                 <i class="fas fa-coffee fa-2x text-primary mb-2"></i>
                                 <h5 class="card-title">Pedidos Pendientes</h5>
-                                <h3 class="text-primary"><?php echo is_array($pedidos_pendientes) ? count($pedidos_pendientes) : 0; ?></h3>
+                                <h3 class="stats-number text-primary" id="pendientes-count"><?php echo is_array($pedidos_pendientes) ? count($pedidos_pendientes) : 0; ?></h3>
                             </div>
                         </div>
                     </div>
@@ -272,7 +272,7 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
                             <div class="card-body">
                                 <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
                                 <h5 class="card-title">Pagados Hoy</h5>
-                                <h3 class="text-success"><?php echo $clientes_atendidos; ?></h3>
+                                <h3 class="stats-number text-success" id="pagados-count"><?php echo $clientes_atendidos; ?></h3>
                             </div>
                         </div>
                     </div>
@@ -281,7 +281,7 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
                             <div class="card-body">
                                 <i class="fas fa-money-bill-wave fa-2x text-info mb-2"></i>
                                 <h5 class="card-title">Ventas del Día</h5>
-                                <h3 class="text-info">$<?php echo number_format($ventas_dia, 2); ?></h3>
+                                <h3 class="stats-number text-info" id="ventas-count">$<?php echo number_format($ventas_dia, 2); ?></h3>
                             </div>
                         </div>
                     </div>
@@ -290,7 +290,7 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
                             <div class="card-body">
                                 <i class="fas fa-users fa-2x text-warning mb-2"></i>
                                 <h5 class="card-title">Clientes Atendidos</h5>
-                                <h3 class="text-warning"><?php echo $clientes_atendidos; ?></h3>
+                                <h3 class="stats-number text-warning" id="clientes-count"><?php echo $clientes_atendidos; ?></h3>
                             </div>
                         </div>
                     </div>
@@ -299,11 +299,16 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
                 <div class="row mt-4">
                     <div class="col-12">
                         <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
+                            <div class="card-header">
                                 <h5 class="mb-0">Pedidos Pendientes de Pago</h5>
-                                <span class="badge bg-light text-dark"><?php echo is_array($pedidos_pendientes) ? count($pedidos_pendientes) : 0; ?> nuevos</span>
+                                <div>
+                                    <span class="badge bg-light text-dark" id="nuevos-count"><?php echo is_array($pedidos_pendientes) ? count($pedidos_pendientes) : 0; ?> nuevos</span>
+                                    <span class="refresh-btn ms-2" id="refresh-pedidos" title="Actualizar pedidos">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </span>
+                                </div>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body" id="pedidos-container">
                                 <?php if (!empty($pedidos_pendientes)): ?>
                                     <?php foreach ($pedidos_pendientes as $pedido): ?>
                                         <div class="order-item mb-4">
@@ -342,8 +347,11 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
 
                 <!-- Reporte de Ventas (últimos 7 días) -->
                 <div class="card mt-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="card-header">
                         <h5 class="mb-0">Reporte de Ventas (Últimos 7 días)</h5>
+                        <button class="btn btn-sm btn-outline-light" id="refresh-report">
+                            <i class="fas fa-sync-alt"></i> Actualizar
+                        </button>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -356,7 +364,7 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
                                         <th>Promedio Pedido</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="reporte-body">
                                     <?php foreach ($reporte as $fila): ?>
                                     <tr>
                                         <td><?php echo $fila['fecha']; ?></td>
@@ -374,57 +382,210 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
         </div>
     </div>
 
+    <!-- Toast para notificaciones -->
+    <div class="toast notification-toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+        <div class="toast-header">
+            <strong class="me-auto">Nuevos pedidos</strong>
+            <small>Ahora</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            Tienes <span id="toast-count">0</span> nuevos pedidos pendientes de pago
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Funcionalidad básica para seleccionar método de pago
-        document.querySelectorAll('.payment-method').forEach(method => {
-            method.addEventListener('click', function() {
-                document.querySelectorAll('.payment-method').forEach(m => {
-                    m.style.border = '1px solid #dee2e6';
+        // Función para actualizar notificaciones
+        function actualizarNotificaciones() {
+            fetch('<?php echo BASE_URL; ?>notificaciones_ajax.php')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('notification-count');
+                    if (badge) {
+                        const prevCount = parseInt(badge.textContent);
+                        badge.textContent = data.nuevas;
+                        
+                        // Mostrar toast si hay nuevas notificaciones
+                        if (data.nuevas > 0 && data.nuevas > prevCount) {
+                            document.getElementById('toast-count').textContent = data.nuevas;
+                            const toast = new bootstrap.Toast(document.querySelector('.notification-toast'));
+                            toast.show();
+                            
+                            // Animación de parpadeo en el card de pendientes
+                            const cardPendientes = document.getElementById('card-pendientes');
+                            cardPendientes.classList.add('pulse');
+                            setTimeout(() => {
+                                cardPendientes.classList.remove('pulse');
+                            }, 3000);
+                        }
+                    }
+                    
+                    // Actualizar contadores
+                    if (data.pendientes !== undefined) {
+                        document.getElementById('pendientes-count').textContent = data.pendientes;
+                        document.getElementById('nuevos-count').textContent = data.pendientes + ' nuevos';
+                    }
+                    
+                    if (data.pagados !== undefined) {
+                        document.getElementById('pagados-count').textContent = data.pagados;
+                        document.getElementById('clientes-count').textContent = data.pagados;
+                    }
+                    
+                    if (data.ventas !== undefined) {
+                        document.getElementById('ventas-count').textContent = '$' + parseFloat(data.ventas).toFixed(2);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al obtener notificaciones:', error);
                 });
-                this.style.border = '2px solid #4e342e';
-                
-                // Si es tarjeta, ocultar campo de cambio
-                const changeInput = document.querySelector('input[readonly]');
-                const amountInput = document.querySelector('input[type="number"]');
-                if (this.textContent.includes('Tarjeta')) {
-                    changeInput.value = '$0.00';
-                    amountInput.value = '24.20';
-                    amountInput.readOnly = true;
-                } else {
-                    amountInput.readOnly = false;
-                    amountInput.value = '';
-                    changeInput.value = '$0.00';
-                }
-            });
-        });
+        }
 
-        // Calcular cambio cuando se ingresa monto en efectivo
-        document.querySelector('input[type="number"]').addEventListener('input', function() {
-            const total = 24.20;
-            const received = parseFloat(this.value) || 0;
-            const change = received - total;
-            
-            const changeInput = document.querySelector('input[readonly]');
-            if (change >= 0) {
-                changeInput.value = '$' + change.toFixed(2);
-            } else {
-                changeInput.value = 'Fondos insuficientes';
+        // Función para cargar pedidos pendientes
+function cargarPedidosPendientes() {
+    const container = document.getElementById('pedidos-container');
+    container.classList.add('loading');
+    
+    fetch('<?php echo BASE_URL; ?>pedidos_pendientes_ajax.php')
+        .then(response => {
+            // Verificar si la respuesta es JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('La respuesta no es JSON');
             }
-        });
-
-        // Simulación de notificaciones
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const badge = this.querySelector('.notification-badge');
-                if (badge) {
-                    badge.style.display = 'none';
-                }
+            return response.json();
+        })
+        .then(data => {
+            container.classList.remove('loading');
+            
+            // Verificar si hay error en la respuesta
+            if (data.error) {
+                container.innerHTML = '<div class="alert alert-danger mb-0">Error: ' + data.error + '</div>';
+                return;
+            }
+            
+            if (data.length === 0) {
+                container.innerHTML = '<div class="alert alert-info mb-0">No hay pedidos pendientes de pago.</div>';
+                return;
+            }
+            
+            let html = '';
+            data.forEach(pedido => {
+                html += `
+                <div class="order-item mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6>Orden #${pedido.codigo} - ${pedido.tipo}</h6>
+                        ${pedido.estado === 'pagado' ? 
+                            '<span class="badge bg-success">Pagado</span>' : 
+                            '<span class="badge bg-warning text-dark">No Pagado</span>'}
+                    </div>
+                    <p class="mb-1">Cliente: ${pedido.cliente_nombre || ''}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Creado: ${new Date(pedido.creado_en).toLocaleString()}</small>
+                        <span class="fw-bold">$${parseFloat(pedido.total).toFixed(2)}</span>
+                    </div>
+                    <div class="text-end mt-2 d-flex gap-2 justify-content-end">
+                        <a href="<?php echo BASE_URL; ?>cajero/pagos?pedido_id=${pedido.id}" class="btn btn-sm btn-primary">Procesar Pago</a>
+                        <form method="post" action="<?php echo BASE_URL; ?>cajero/togglePago" style="display:inline;">
+                            <input type="hidden" name="pedido_id" value="${pedido.id}">
+                            <input type="hidden" name="estado_actual" value="${pedido.estado}">
+                            <button type="submit" class="btn btn-sm ${pedido.estado === 'pagado' ? 'btn-warning' : 'btn-success'}">
+                                ${pedido.estado === 'pagado' ? 'Marcar No Pagado' : 'Marcar Pagado'}
+                            </button>
+                        </form>
+                    </div>
+                </div>`;
             });
+            
+            container.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error al cargar pedidos:', error);
+            container.classList.remove('loading');
+            container.innerHTML = '<div class="alert alert-danger mb-0">Error al cargar los pedidos. Por favor, recarga la página.</div>';
         });
-        
+}
 
+// Función temporal para debuggear
+function debugFetch() {
+fetch('<?php echo BASE_URL; ?>pedidos_pendientes_ajax.php')
+    .then(response => response.text())
+        .then(text => {
+            console.log('Respuesta del servidor:', text);
+        })
+        .catch(error => {
+            console.error('Error en debug:', error);
+        });
+}
+
+// Llama a esta función para ver qué está devolviendo realmente el servidor
+debugFetch();
+        // Función para cargar reporte de ventas
+// Función para cargar reporte de ventas
+function cargarReporteVentas() {
+    const btnRefresh = document.getElementById('refresh-report');
+    const tbody = document.getElementById('reporte-body');
+    
+    btnRefresh.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    tbody.innerHTML = '<tr><td colspan="4" class="text-center">Cargando...</td></tr>';
+    
+    // Usar las mismas fechas que se muestran inicialmente
+    const fecha_inicio = '<?php echo $fecha_inicio; ?>';
+    const fecha_fin = '<?php echo $fecha_fin; ?>';
+    
+    fetch(`<?php echo BASE_URL; ?>cajero/reporteVentasAjax?inicio=${fecha_inicio}&fin=${fecha_fin}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+            }
+            return response.json();
+        })
+        .then(data => {
+            btnRefresh.innerHTML = '<i class="fas fa-sync-alt"></i> Actualizar';
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center">No hay datos de ventas</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            data.forEach(fila => {
+                html += `
+                <tr>
+                    <td>${fila.fecha}</td>
+                    <td>${fila.numero_pedidos}</td>
+                    <td>$${parseFloat(fila.total_ventas).toFixed(2)}</td>
+                    <td>$${parseFloat(fila.promedio_pedido).toFixed(2)}</td>
+                </tr>`;
+            });
+            
+            tbody.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error al cargar reporte:', error);
+            btnRefresh.innerHTML = '<i class="fas fa-sync-alt"></i> Actualizar';
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center">Error al cargar el reporte</td></tr>';
+        });
+}
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar datos iniciales
+            actualizarNotificaciones();
+            
+            // Configurar intervalos de actualización
+            setInterval(actualizarNotificaciones, 5000);
+            
+            // Configurar botones de actualización
+            document.getElementById('refresh-pedidos').addEventListener('click', cargarPedidosPendientes);
+            document.getElementById('refresh-report').addEventListener('click', cargarReporteVentas);
+            
+            // Efecto de carga inicial
+            document.getElementById('card-pendientes').classList.add('pulse');
+            setTimeout(() => {
+                document.getElementById('card-pendientes').classList.remove('pulse');
+            }, 2000);
+        });
     </script>
 </body>
 </html>
