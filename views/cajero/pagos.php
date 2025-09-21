@@ -128,4 +128,11 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <?php } else { ?>
 <div class="alert alert-info mt-4 text-center">No hay pedidos pendientes de pago.</div>
+ <!-- Botón para regresar al Dashboard -->
+    <div style="margin-top: 20px;">
+        <a href="<?php echo BASE_URL; ?>cajero/dashboard" class="btn btn-primary">
+            <i class="fas fa-arrow-left me-2"></i>Regresar al Dashboard
+        </a>
+    </div>
+</div>
 <?php } ?>
