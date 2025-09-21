@@ -13,8 +13,9 @@ class PedidoModel {
     public function crearPedido($data) {
     $db = $this->db;
 
-    $stmt = $db->prepare("INSERT INTO pedidos (cliente_id, nombre_cliente, tipo, total, estado) 
-                          VALUES (:cliente_id, :nombre_cliente, :tipo, :total, 'creado')");
+    $stmt = $db->prepare("INSERT INTO pedidos (codigo, cliente_id, nombre_cliente, tipo, total, estado) 
+                          VALUES (:codigo, :cliente_id, :nombre_cliente, :tipo, :total, 'creado')");
+    $stmt->bindParam(':codigo', $data['codigo']);
     $stmt->bindParam(':cliente_id', $data['cliente_id']);
     $stmt->bindParam(':nombre_cliente', $data['nombre_cliente']);
     $stmt->bindParam(':tipo', $data['tipo']);
@@ -136,10 +137,14 @@ public function obtenerPedidosParaPago() {
                  ORDER BY p.creado_en DESC";
         $stmt = $this->db->prepare($query);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Siempre retornar array, incluso si está vacío
+        return is_array($result) ? $result : [];
+        
     } catch(PDOException $exception) {
         error_log("Error al obtener pedidos para pago: " . $exception->getMessage());
-        return false;
+        return []; // Siempre retornar array vacío en caso de error
     }
 }
 public function obtenerReporteVentas($fecha_inicio, $fecha_fin) {
@@ -150,7 +155,7 @@ public function obtenerReporteVentas($fecha_inicio, $fecha_fin) {
                     SUM(p.total) as total_ventas,
                     AVG(p.total) as promedio_pedido
                  FROM pedidos p 
-                 WHERE p.estado = 'completado' 
+                 WHERE p.estado = 'pagado'
                  AND DATE(p.creado_en) BETWEEN :fecha_inicio AND :fecha_fin
                  GROUP BY DATE(p.creado_en)
                  ORDER BY fecha DESC";
@@ -160,12 +165,16 @@ public function obtenerReporteVentas($fecha_inicio, $fecha_fin) {
         $stmt->bindParam(":fecha_fin", $fecha_fin);
         $stmt->execute();
         
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return is_array($result) ? $result : [];
+        
     } catch(PDOException $exception) {
         error_log("Error al obtener reporte de ventas: " . $exception->getMessage());
         return [];
     }
 }
+
+
 public function actualizarMesa($pedido_id, $mesa_id) {
     $sql = "UPDATE pedidos SET mesa_id = ? WHERE id = ?";
     $stmt = $this->db->prepare($sql);
@@ -173,4 +182,4 @@ public function actualizarMesa($pedido_id, $mesa_id) {
 }
 
 }
-?>
+
