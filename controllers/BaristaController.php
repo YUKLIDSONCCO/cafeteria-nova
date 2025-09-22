@@ -9,6 +9,29 @@ class BaristaController extends BaseController {
     
     public function ingredientesFaltantes() {
         $inventarioModel = $this->model('InventarioModel');
+        
+        // Procesar formulario de actualización
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+            if ($_POST['action'] === 'actualizar' && isset($_POST['producto_id'])) {
+                $resultado = $inventarioModel->actualizarStock(
+                    $_POST['producto_id'],
+                    $_POST['cantidad_actual'],
+                    $_POST['minimo']
+                );
+                
+                if ($resultado) {
+                    $_SESSION['mensaje'] = 'Stock actualizado correctamente';
+                    $_SESSION['mensaje_tipo'] = 'success';
+                } else {
+                    $_SESSION['mensaje'] = 'Error al actualizar el stock';
+                    $_SESSION['mensaje_tipo'] = 'danger';
+                }
+                
+                header('Location: ' . BASE_URL . 'barista/ingredientesFaltantes');
+                return;
+            }
+        }
+        
         $inventario = $inventarioModel->obtenerInventarioCompleto();
         $productos_bajos = $inventarioModel->obtenerProductosStockBajo();
         $total_valor_inventario = $inventarioModel->calcularValorTotalInventario();
