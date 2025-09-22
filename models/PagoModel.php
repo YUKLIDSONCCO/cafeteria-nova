@@ -2,6 +2,7 @@
 require_once '../config/database.php';
 
 class PagoModel {
+    // Método obtenerPagosPendientes ya está definido, eliminar duplicidad
     private $db;
     private $table = 'pagos';
 
@@ -16,7 +17,7 @@ class PagoModel {
 
             // Crear pago
             $query = "INSERT INTO " . $this->table . " (pedido_id, monto, metodo, estado) 
-                     VALUES (:pedido_id, :monto, :metodo, 'completado')";
+                     VALUES (:pedido_id, :monto, :metodo, 'pendiente')";
             $stmt = $this->db->prepare($query);
             
             $stmt->bindParam(":pedido_id", $pedido_id);
@@ -81,6 +82,31 @@ class PagoModel {
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch(PDOException $exception) {
             error_log("Error al obtener totales por método: " . $exception->getMessage());
+            return [];
+        }
+    }
+
+    public function actualizarEstadoPago($pago_id, $estado) {
+        try {
+            $query = "UPDATE pagos SET estado = :estado WHERE id = :pago_id";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(":estado", $estado);
+            $stmt->bindParam(":pago_id", $pago_id);
+            return $stmt->execute();
+        } catch(PDOException $exception) {
+            error_log("Error al actualizar estado de pago: " . $exception->getMessage());
+            return false;
+        }
+    }
+
+    public function obtenerPagosPendientes() {
+        try {
+            $query = "SELECT * FROM pagos WHERE estado = 'pendiente' ORDER BY timestamp DESC";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch(PDOException $exception) {
+            error_log("Error al obtener pagos pendientes: " . $exception->getMessage());
             return [];
         }
     }
