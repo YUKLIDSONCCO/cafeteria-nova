@@ -24,9 +24,15 @@
             <div class="card-body" id="pedidos_confirmados">
                 <?php if (!empty($pedidos_confirmados)): ?>
                     <?php foreach ($pedidos_confirmados as $pedido): ?>
-                    <div class="card mb-3 border-0 shadow-sm rounded-4" style="background-color: #f9f1fb;">
+                    <div class="card mb-3 border-0 shadow-sm rounded-4 pedido-card cursor-pointer hover-effect" 
+                         data-pedido-id="<?php echo $pedido['id']; ?>" 
+                         data-estado="confirmado"
+                         style="background-color: #f9f1fb; transition: all 0.3s ease;">
                         <div class="card-body">
-                            <h6 class="fw-bold" style="color:#8e44ad;">Pedido <?php echo "NV-" . str_pad($pedido['id'], 4, "0", STR_PAD_LEFT); ?></h6>
+                            <h6 class="fw-bold" style="color:#8e44ad;">
+                                Pedido <?php echo "NV-" . str_pad($pedido['id'], 4, "0", STR_PAD_LEFT); ?>
+                                <span class="click-indicator">👆</span>
+                            </h6>
                             <?php if (!empty($pedido['productos_categorizados'])): ?>
                                 <!-- Bebidas -->
                                 <?php if (!empty($pedido['productos_categorizados']['bebidas'])): ?>
@@ -61,9 +67,7 @@
                                 <?php endif; ?>
                             <?php endif; ?>
                             <p class="fw-bold mt-2" style="color:#d63384;">Total: $<?php echo number_format($pedido['total'], 2); ?></p>
-                            <a href="<?php echo BASE_URL; ?>barista/iniciarPreparacion/<?php echo $pedido['id']; ?>" 
-                               class="btn btn-sm text-white fw-bold" 
-                               style="background: linear-gradient(45deg, #f39c12, #ff6699); border-radius: 20px;">Iniciar Preparación</a>
+                            <small class="text-muted">👆 Click para iniciar preparación</small>
                         </div>
                     </div>
                     <?php endforeach; ?>
@@ -84,9 +88,15 @@
             <div class="card-body" id="pedidos_preparacion">
                 <?php if (!empty($pedidos_preparacion)): ?>
                     <?php foreach ($pedidos_preparacion as $pedido): ?>
-                    <div class="card mb-3 border-0 shadow-sm rounded-4" style="background-color: #fff7e6;">
+                    <div class="card mb-3 border-0 shadow-sm rounded-4 pedido-card cursor-pointer hover-effect" 
+                         data-pedido-id="<?php echo $pedido['id']; ?>" 
+                         data-estado="preparacion"
+                         style="background-color: #fff7e6; transition: all 0.3s ease;">
                         <div class="card-body">
-                            <h6 class="fw-bold" style="color:#e67e22;">Pedido <?php echo "NV-" . str_pad($pedido['id'], 4, "0", STR_PAD_LEFT); ?></h6>
+                            <h6 class="fw-bold" style="color:#e67e22;">
+                                Pedido <?php echo "NV-" . str_pad($pedido['id'], 4, "0", STR_PAD_LEFT); ?>
+                                <span class="click-indicator">👆</span>
+                            </h6>
                             <?php if (!empty($pedido['productos_categorizados'])): ?>
                                 <!-- Bebidas -->
                                 <?php if (!empty($pedido['productos_categorizados']['bebidas'])): ?>
@@ -121,9 +131,7 @@
                                 <?php endif; ?>
                             <?php endif; ?>
                             <p class="fw-bold mt-2" style="color:#d63384;">Total: $<?php echo number_format($pedido['total'], 2); ?></p>
-                            <a href="<?php echo BASE_URL; ?>barista/finalizarPreparacion/<?php echo $pedido['id']; ?>" 
-                               class="btn btn-sm text-white fw-bold" 
-                               style="background: linear-gradient(45deg, #27ae60, #ff66b2); border-radius: 20px;">Marcar como Listo</a>
+                            <small class="text-muted">👆 Click para marcar como listo</small>
                         </div>
                     </div>
                     <?php endforeach; ?>
@@ -193,3 +201,90 @@
         </div>
     </div>
 </div>
+
+<!-- CSS adicional para efectos del Dashboard Barista -->
+<style>
+.cursor-pointer {
+    cursor: pointer !important;
+}
+
+.hover-effect {
+    transition: all 0.3s ease !important;
+}
+
+.hover-effect:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 25px rgba(106, 13, 173, 0.2) !important;
+}
+
+.click-indicator {
+    font-size: 11px;
+    margin-left: 8px;
+    animation: bounce 1.5s infinite;
+    color: #6a0dad;
+}
+
+.processing {
+    pointer-events: none !important;
+    opacity: 0.6 !important;
+}
+
+.pedido-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.pedido-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #6a0dad, transparent);
+    transition: left 0.5s;
+}
+
+.pedido-card:hover::before {
+    left: 100%;
+}
+
+#ultimaActualizacion {
+    font-size: 11px;
+    color: #6c757d;
+    background: rgba(106, 13, 173, 0.1);
+    padding: 4px 12px;
+    border-radius: 15px;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-3px); }
+    60% { transform: translateY(-1px); }
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(106, 13, 173, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(106, 13, 173, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(106, 13, 173, 0); }
+}
+
+.alert {
+    animation: pulse 2s infinite;
+}
+</style>
+
+<!-- JavaScript del Dashboard del Barista -->
+<script src="<?php echo BASE_URL; ?>public/js/barista-dashboard.js"></script>
