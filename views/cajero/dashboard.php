@@ -50,6 +50,8 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
             height: 100vh;
             position: fixed;
             padding-top: 20px;
+            border-top-right-radius: 20px;
+            border-bottom-right-radius: 20px;
         }
         
         .sidebar .logo {
@@ -63,7 +65,7 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
             color: var(--secondary-color);
             padding: 12px 20px;
             margin: 6px 0;
-            border-radius: 5px;
+            border-radius: 12px;
         }
         
         .sidebar .nav-link:hover, .sidebar .nav-link.active {
@@ -83,7 +85,7 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
         .header {
             background-color: white;
             padding: 15px 20px;
-            border-radius: 8px;
+            border-radius: 16px;
             box-shadow: 0 2px 6px rgba(138, 39, 214, 0.1);
             margin-bottom: 20px;
             display: flex;
@@ -93,10 +95,11 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
         
         .card {
             border: none;
-            border-radius: 8px;
+            border-radius: 18px !important;
             box-shadow: 0 2px 6px rgba(140, 23, 236, 0.1);
             margin-bottom: 20px;
             transition: transform 0.3s;
+            overflow: hidden;
         }
         
         .card:hover {
@@ -106,12 +109,16 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
         .card-header {
             background-color: var(--primary-color);
             color: white;
-            border-radius: 8px 8px 0 0 !important;
+            border-radius: 18px 18px 0 0 !important;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         
+        .btn {
+            border-radius: 25px !important;
+        }
+
         .btn-primary {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
@@ -133,9 +140,11 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
         
         .order-item {
             border-left: 4px solid var(--accent-color);
-            padding-left: 15px;
+            padding: 12px;
             margin-bottom: 15px;
             transition: all 0.3s;
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.05);
         }
         
         .order-item:hover {
@@ -160,6 +169,7 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
         .payment-method {
             cursor: pointer;
             transition: all 0.3s;
+            border-radius: 14px;
         }
         
         .payment-method:hover {
@@ -167,8 +177,17 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
+        .table {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
         .table-hover tbody tr:hover {
             background-color: rgba(78, 52, 46, 0.05);
+        }
+
+        .table thead th {
+            border-bottom: 2px solid rgba(0,0,0,0.08);
         }
         
         .notification-toast {
@@ -177,6 +196,12 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
             right: 20px;
             z-index: 1100;
             min-width: 250px;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        
+        .toast-header {
+            border-radius: 14px 14px 0 0 !important;
         }
         
         .refresh-btn {
@@ -208,6 +233,7 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
             font-weight: bold;
         }
     </style>
+
 </head>
 <body>
     <div class="container-fluid">
