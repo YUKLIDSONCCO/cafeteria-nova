@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Dashboard Barista</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { background: #f8f9fa; padding: 20px; margin: 10px 0; border-radius: 8px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Dashboard del Barista</h1>
+    
+    <div class="test-section">
+        <h3>📋 Funcionalidades Implementadas:</h3>
+        <ul>
+            <li class="success">✅ Auto-refresh cada 3 segundos</li>
+            <li class="success">✅ Click en cualquier parte del pedido para cambiar estado</li>
+            <li class="success">✅ Confirmado → Preparación (click)</li>
+            <li class="success">✅ Preparación → Listo (click)</li>
+            <li class="success">✅ Detección de cambios optimizada</li>
+            <li class="success">✅ Notificaciones visuales</li>
+            <li class="success">✅ Efectos CSS mejorados</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h3>🔧 Archivos Modificados/Creados:</h3>
+        <ul>
+            <li><strong>controllers/BaristaController.php</strong> - Agregados métodos AJAX</li>
+            <li><strong>views/barista/dashboard.php</strong> - Tarjetas clickeables + CSS</li>
+            <li><strong>public/js/barista-dashboard.js</strong> - JavaScript principal</li>
+            <li><strong>public/barista_ajax.php</strong> - Endpoint AJAX dedicado</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h3>🚀 Cómo Probar:</h3>
+        <ol>
+            <li>Accede al dashboard del barista</li>
+            <li>Verifica que aparezca "Última actualización" con timestamp</li>
+            <li>Si hay pedidos confirmados, haz click en cualquier parte del cuadro</li>
+            <li>El pedido debe moverse automáticamente a "En Preparación"</li>
+            <li>Haz click en un pedido en preparación</li>
+            <li>El pedido debe moverse a "Listos para Entregar"</li>
+            <li>Observa las notificaciones visuales y efectos</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h3>⚙️ Configuración Técnica:</h3>
+        <ul>
+            <li><strong>Auto-refresh:</strong> 3 segundos</li>
+            <li><strong>Base URL:</strong> http://172.80.15.22/cafeteria-nova/public/</li>
+            <li><strong>AJAX Endpoint:</strong> barista_ajax.php</li>
+            <li><strong>Acciones:</strong> obtenerPedidos, iniciarPreparacion, finalizarPreparacion</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h3>🎯 Flujo de Estados:</h3>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div style="background: #f9f1fb; padding: 15px; border-radius: 8px; text-align: center;">
+                <strong>💜 Confirmado</strong><br>
+                <small>Click → Preparación</small>
+            </div>
+            <div style="font-size: 20px;">→</div>
+            <div style="background: #fff7e6; padding: 15px; border-radius: 8px; text-align: center;">
+                <strong>💛 Preparación</strong><br>
+                <small>Click → Listo</small>
+            </div>
+            <div style="font-size: 20px;">→</div>
+            <div style="background: #f0fff4; padding: 15px; border-radius: 8px; text-align: center;">
+                <strong>💚 Listo</strong><br>
+                <small>Final</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>🔍 Debug Tools:</h3>
+        <button onclick="checkConsole()">Abrir Console (F12)</button>
+        <button onclick="testAjax()">Test AJAX</button>
+        <button onclick="simulateClick()">Simular Click</button>
+        
+        <script>
+            function checkConsole() {
+                console.log('🌸 Dashboard del Barista - Debug Info:');
+                console.log('Base URL:', 'http://172.80.15.22/cafeteria-nova/public/');
+                console.log('Auto-refresh:', 'Cada 3 segundos');
+                console.log('Estado actual:', window.baristaDashboard ? 'Activo' : 'No iniciado');
+            }
+            
+            function testAjax() {
+                fetch('http://172.80.15.22/cafeteria-nova/public/barista_ajax.php?action=obtenerPedidos', {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(response => response.json())
+                .then(data => console.log('✅ Test AJAX exitoso:', data))
+                .catch(error => console.error('❌ Test AJAX falló:', error));
+            }
+            
+            function simulateClick() {
+                const pedidoCards = document.querySelectorAll('.pedido-card');
+                if (pedidoCards.length > 0) {
+                    pedidoCards[0].click();
+                    console.log('🖱️ Click simulado en primer pedido');
+                } else {
+                    console.log('ℹ️ No hay pedidos para hacer click');
+                }
+            }
+        </script>
+    </div>
+</body>
+</html>
