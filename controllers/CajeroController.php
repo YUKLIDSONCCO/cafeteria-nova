@@ -95,20 +95,26 @@ public function reporteVentasAjax() {
     exit;
 }
     // Cambiar estado de pago del pedido
-    public function togglePago() {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $pedido_id = $_POST['pedido_id'];
-            $estado_actual = $_POST['estado_actual'];
+public function togglePago() {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $pedido_id = $_POST['pedido_id'] ?? null;
+        $estado_actual = $_POST['estado_actual'] ?? '';
+        
+        if ($pedido_id) {
             $pedidoModel = $this->model('PedidoModel');
             $nuevo_estado = ($estado_actual === 'pagado') ? 'no pagado' : 'pagado';
+            
             if ($pedidoModel->actualizarEstado($pedido_id, $nuevo_estado)) {
                 $_SESSION['success'] = 'Estado de pago actualizado.';
             } else {
                 $_SESSION['error'] = 'No se pudo actualizar el estado.';
             }
+        } else {
+            $_SESSION['error'] = 'ID de pedido no válido.';
         }
-        $this->redirect('cajero/dashboard');
     }
+    $this->redirect('cajero/dashboard');
+}
 // Agrega este método ANTES del método togglePago()
 // ... otros métodos existentes ...
 

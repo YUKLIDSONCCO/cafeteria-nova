@@ -1,8 +1,8 @@
 <?php
 // Configuración de la aplicación
-define('BASE_URL', 'http://192.168.18.21/cafeteria-nova/public/');
+define('BASE_URL', 'http://172.80.15.22/cafeteria-nova/public/');
 
-define('DB_HOST', '192.168.18.21');
+define('DB_HOST', 'localhost');
 define('DB_NAME', 'cafeteria_nova');
 define('DB_USER', 'root');
 define('DB_PASS', '');

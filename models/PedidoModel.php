@@ -140,46 +140,55 @@ class PedidoModel {
 
 public function obtenerPedidosParaPago() {
     try {
-        $query = "SELECT p.*, u.nombre as cliente_nombre 
-                 FROM pedidos p 
-                 LEFT JOIN usuarios u ON p.cliente_id = u.id 
-                 WHERE p.estado IN ('listo', 'entregado') 
-                 ORDER BY p.creado_en DESC";
-        $stmt = $this->db->prepare($query);
+        $sql = "SELECT 
+                    p.id,
+                    COALESCE(p.codigo, CONCAT('ORD', LPAD(p.id, 4, '0'))) as codigo,
+                    COALESCE(p.nombre_cliente, 'Cliente') as cliente_nombre,
+                    p.tipo,
+                    p.estado,
+                    p.total,
+                    p.creado_en
+                FROM pedidos p
+                WHERE p.estado IN ('listo', 'preparacion', 'creado')
+                ORDER BY p.creado_en ASC";
+        
+        $stmt = $this->db->prepare($sql);
         $stmt->execute();
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // Siempre retornar array, incluso si está vacío
-        return is_array($result) ? $result : [];
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-    } catch(PDOException $exception) {
-        error_log("Error al obtener pedidos para pago: " . $exception->getMessage());
-        return []; // Siempre retornar array vacío en caso de error
+    } catch (PDOException $e) {
+        error_log("Error en obtenerPedidosParaPago: " . $e->getMessage());
+        return [];
     }
 }
 public function obtenerReporteVentas($fecha_inicio, $fecha_fin) {
     try {
-        $query = "SELECT 
-                    DATE(p.creado_en) as fecha,
-                    COUNT(p.id) as numero_pedidos,
-                    SUM(p.total) as total_ventas,
-                    AVG(p.total) as promedio_pedido
-                 FROM pedidos p 
-                 WHERE p.estado = 'pagado'
-                 AND DATE(p.creado_en) BETWEEN :fecha_inicio AND :fecha_fin
-                 GROUP BY DATE(p.creado_en)
-                 ORDER BY fecha DESC";
+        $sql = "SELECT 
+                    DATE(creado_en) as fecha,
+                    COUNT(*) as numero_pedidos,
+                    COALESCE(SUM(total), 0) as total_ventas,
+                    COALESCE(AVG(total), 0) as promedio_pedido
+                FROM pedidos 
+                WHERE estado IN ('pagado', 'entregado')
+                AND DATE(creado_en) BETWEEN ? AND ?
+                GROUP BY DATE(creado_en)
+                ORDER BY fecha DESC";
         
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(":fecha_inicio", $fecha_inicio);
-        $stmt->bindParam(":fecha_fin", $fecha_fin);
-        $stmt->execute();
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$fecha_inicio, $fecha_fin]);
         
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return is_array($result) ? $result : [];
+        $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-    } catch(PDOException $exception) {
-        error_log("Error al obtener reporte de ventas: " . $exception->getMessage());
+        // Si no hay datos, devolver array vacío
+        if (!$resultado) {
+            return [];
+        }
+        
+        return $resultado;
+        
+    } catch (PDOException $e) {
+        error_log("Error en obtenerReporteVentas: " . $e->getMessage());
         return [];
     }
 }

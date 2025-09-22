@@ -37,6 +37,10 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
             --fruit-red: #ef9a9a;
             --ade-blue: #90caf9;
             --smoothie-yellow: #fff59d;
+            --lila-color: #b39ddb;
+            --rosa-color: #f8bbd9;
+            --lila-suave: #e1bee7;
+            --rosa-suave: #fce4ec;
         }
         
         body {
@@ -50,167 +54,235 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
             height: 100vh;
             position: fixed;
             padding-top: 20px;
-            border-top-right-radius: 20px;
-            border-bottom-right-radius: 20px;
+            border-top-right-radius: 25px;
+            border-bottom-right-radius: 25px;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--lila-color);
         }
         
         .sidebar .logo {
             text-align: center;
             padding: 0 20px 20px;
-            border-bottom: 1px solid var(--secondary-color);
-            margin-bottom: 20px;
+            border-bottom: 2px solid var(--lila-color);
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
+            border-radius: 15px;
+            margin: 10px;
+            padding: 15px;
         }
         
         .sidebar .nav-link {
             color: var(--secondary-color);
-            padding: 12px 20px;
-            margin: 6px 0;
-            border-radius: 12px;
+            padding: 14px 20px;
+            margin: 8px 10px;
+            border-radius: 15px;
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
         }
         
         .sidebar .nav-link:hover, .sidebar .nav-link.active {
-            background-color: var(--dark-color);
-            color: white;
+            background: linear-gradient(135deg, var(--lila-color) 0%, var(--rosa-color) 100%);
+            color: var(--dark-color);
+            border-left: 3px solid var(--rosa-color);
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(179, 157, 219, 0.3);
         }
         
         .sidebar .nav-link i {
-            margin-right: 10px;
+            margin-right: 12px;
+            color: var(--lila-suave);
+        }
+        
+        .sidebar .nav-link:hover i, .sidebar .nav-link.active i {
+            color: var(--dark-color);
         }
         
         .main-content {
             margin-left: 250px;
-            padding: 20px;
+            padding: 25px;
         }
         
         .header {
-            background-color: white;
-            padding: 15px 20px;
-            border-radius: 16px;
-            box-shadow: 0 2px 6px rgba(138, 39, 214, 0.1);
-            margin-bottom: 20px;
+            background: linear-gradient(135deg, #ffffff 0%, var(--rosa-suave) 100%);
+            padding: 18px 25px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(179, 157, 219, 0.2);
+            margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border: 2px solid var(--lila-suave);
         }
         
         .card {
             border: none;
-            border-radius: 18px !important;
-            box-shadow: 0 2px 6px rgba(140, 23, 236, 0.1);
-            margin-bottom: 20px;
-            transition: transform 0.3s;
+            border-radius: 20px !important;
+            box-shadow: 0 4px 15px rgba(179, 157, 219, 0.15);
+            margin-bottom: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             overflow: hidden;
+            border: 2px solid transparent;
+            background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
         }
         
         .card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+            box-shadow: 0 8px 25px rgba(179, 157, 219, 0.25);
+            border: 2px solid var(--lila-suave);
         }
         
         .card-header {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--lila-color) 100%);
             color: white;
-            border-radius: 18px 18px 0 0 !important;
+            border-radius: 20px 20px 0 0 !important;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 15px 20px;
+            border-bottom: 3px solid var(--rosa-color);
         }
         
         .btn {
-            border-radius: 25px !important;
+            border-radius: 30px !important;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
         }
 
         .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--lila-color) 100%);
+            border-color: var(--lila-color);
         }
         
         .btn-primary:hover {
-            background-color: var(--dark-color);
-            border-color: var(--dark-color);
+            background: linear-gradient(135deg, var(--lila-color) 0%, var(--rosa-color) 100%);
+            border-color: var(--rosa-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(179, 157, 219, 0.4);
         }
         
         .badge-pending {
-            background-color: #ffc107;
+            background: linear-gradient(135deg, #ffc107 0%, #ffeb3b 100%);
             color: black;
+            border-radius: 15px;
+            padding: 6px 12px;
         }
         
         .badge-paid {
-            background-color: #28a745;
+            background: linear-gradient(135deg, #28a745 0%, #4caf50 100%);
+            border-radius: 15px;
+            padding: 6px 12px;
         }
         
         .order-item {
-            border-left: 4px solid var(--accent-color);
-            padding: 12px;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-            border-radius: 12px;
-            border: 1px solid rgba(0,0,0,0.05);
+            border-left: 5px solid var(--lila-color);
+            padding: 18px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            border-radius: 15px;
+            border: 2px solid #f0f0f0;
+            background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
         .order-item:hover {
-            background-color: rgba(255, 87, 34, 0.05);
+            background: linear-gradient(135deg, #ffffff 0%, var(--rosa-suave) 100%);
+            border-left: 5px solid var(--rosa-color);
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(179, 157, 219, 0.2);
         }
         
         .notification-badge {
             position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: var(--accent-color);
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, var(--rosa-color) 0%, var(--lila-color) 100%);
             color: white;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 12px;
+            font-weight: bold;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(179, 157, 219, 0.3);
         }
         
         .payment-method {
             cursor: pointer;
-            transition: all 0.3s;
-            border-radius: 14px;
+            transition: all 0.3s ease;
+            border-radius: 18px;
+            border: 2px solid transparent;
         }
         
         .payment-method:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-8px);
+            box-shadow: 0 8px 25px rgba(179, 157, 219, 0.3);
+            border: 2px solid var(--lila-color);
         }
         
         .table {
-            border-radius: 12px;
+            border-radius: 15px;
             overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 2px solid var(--lila-suave);
         }
 
         .table-hover tbody tr:hover {
-            background-color: rgba(78, 52, 46, 0.05);
+            background: linear-gradient(135deg, var(--rosa-suave) 0%, #ffffff 100%);
+            transform: scale(1.01);
+            transition: all 0.2s ease;
         }
 
         .table thead th {
-            border-bottom: 2px solid rgba(0,0,0,0.08);
+            background: linear-gradient(135deg, var(--lila-color) 0%, var(--primary-color) 100%);
+            color: white;
+            border-bottom: 3px solid var(--rosa-color);
+            padding: 15px;
+            font-weight: 600;
+        }
+        
+        .table tbody td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
         }
         
         .notification-toast {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 25px;
+            right: 25px;
             z-index: 1100;
-            min-width: 250px;
-            border-radius: 14px;
+            min-width: 300px;
+            border-radius: 18px;
             overflow: hidden;
+            box-shadow: 0 5px 20px rgba(179, 157, 219, 0.3);
+            border: 2px solid var(--lila-suave);
         }
         
         .toast-header {
-            border-radius: 14px 14px 0 0 !important;
+            background: linear-gradient(135deg, var(--lila-color) 0%, var(--rosa-color) 100%);
+            color: white;
+            border-radius: 18px 18px 0 0 !important;
+            padding: 12px 15px;
+            border-bottom: 2px solid var(--rosa-suave);
         }
         
         .refresh-btn {
             cursor: pointer;
-            transition: transform 0.5s;
+            transition: transform 0.5s ease;
+            background: linear-gradient(135deg, var(--lila-suave) 0%, #ffffff 100%);
+            padding: 8px;
+            border-radius: 50%;
+            border: 2px solid var(--lila-color);
         }
         
         .refresh-btn:hover {
             transform: rotate(180deg);
+            background: linear-gradient(135deg, var(--rosa-color) 0%, var(--lila-color) 100%);
+            color: white;
         }
         
         .loading {
@@ -219,21 +291,78 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
         }
         
         .pulse {
-            animation: pulse 1.5s infinite;
+            animation: pulse 1.5s infinite ease-in-out;
         }
         
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% { 
+                transform: scale(1);
+                box-shadow: 0 4px 15px rgba(179, 157, 219, 0.15);
+            }
+            50% { 
+                transform: scale(1.05);
+                box-shadow: 0 8px 25px rgba(179, 157, 219, 0.3);
+            }
+            100% { 
+                transform: scale(1);
+                box-shadow: 0 4px 15px rgba(179, 157, 219, 0.15);
+            }
         }
         
         .stats-number {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: bold;
+            background: linear-gradient(135deg, var(--lila-color) 0%, var(--rosa-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .card-body {
+            padding: 25px;
+        }
+        
+        .text-primary {
+            color: var(--lila-color) !important;
+        }
+        
+        .text-success {
+            color: var(--rosa-color) !important;
+        }
+        
+        .text-warning {
+            color: #ffa726 !important;
+        }
+        
+        .alert {
+            border-radius: 15px;
+            border: 2px solid transparent;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-info {
+            background: linear-gradient(135deg, #e3f2fd 0%, var(--lila-suave) 100%);
+            border-color: var(--lila-color);
+            color: var(--dark-color);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--rosa-color) 0%, #f06292 100%);
+            border-color: var(--rosa-color);
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #f06292 0%, var(--rosa-color) 100%);
+            border-color: #f06292;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffb74d 0%, #ffa726 100%);
+            border-color: #ffa726;
         }
     </style>
-
 </head>
 <body>
     <div class="container-fluid">
@@ -271,7 +400,7 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 main-content">
                 <!-- Mensaje de bienvenida siempre visible arriba -->
-                <div class="header sticky-top bg-white" style="z-index: 1050; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+                <div class="header sticky-top" style="z-index: 1050;">
                     <h4 class="mb-0">Bienvenido, <span class="text-primary"><?php echo $_SESSION['usuario_nombre'] ?? 'CAJERO'; ?></span></h4>
                     <div class="d-flex align-items-center">
                         <div class="me-3 position-relative">
@@ -289,7 +418,7 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
                             <div class="card-body">
                                 <i class="fas fa-coffee fa-2x text-primary mb-2"></i>
                                 <h5 class="card-title">Pedidos Pendientes</h5>
-                                <h3 class="stats-number text-primary" id="pendientes-count"><?php echo is_array($pedidos_pendientes) ? count($pedidos_pendientes) : 0; ?></h3>
+                                <h3 class="stats-number" id="pendientes-count"><?php echo is_array($pedidos_pendientes) ? count($pedidos_pendientes) : 0; ?></h3>
                             </div>
                         </div>
                     </div>
@@ -302,15 +431,7 @@ $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-lg-3">
-                        <div class="card text-center">
-                            <div class="card-body">
-                                <i class="fas fa-money-bill-wave fa-2x text-info mb-2"></i>
-                                <h5 class="card-title">Ventas del Día</h5>
-                                <h3 class="stats-number text-info" id="ventas-count">$<?php echo number_format($ventas_dia, 2); ?></h3>
-                            </div>
-                        </div>
-                    </div>
+                    
                     <div class="col-md-6 col-lg-3">
                         <div class="card text-center">
                             <div class="card-body">

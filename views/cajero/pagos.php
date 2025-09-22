@@ -89,7 +89,9 @@ if (!empty($pedidos_pendientes)) {
                             <button type="submit" class="btn btn-success">
                                 <i class="fas fa-check-circle me-2"></i>Confirmar Pago
                             </button>
-                            <a href="<?php echo BASE_URL; ?>cajero/pagos" class="btn btn-outline-secondary">Cancelar</a>
+                            <a href="<?php echo BASE_URL; ?>cajero/dashboard" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Regresar al Dashboard
+                            </a>
                         </div>
                     </form>
                 </div>
@@ -127,11 +129,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <?php } else { ?>
-<div class="alert alert-info mt-4 text-center">No hay pedidos pendientes de pago.</div>
- <!-- Botón para regresar al Dashboard -->
-    <div style="margin-top: 20px;">
+<div class="container mt-4">
+    <div class="alert alert-info text-center">No hay pedidos pendientes de pago.</div>
+    <!-- Botón para regresar al Dashboard -->
+    <div class="text-center mt-3">
         <a href="<?php echo BASE_URL; ?>cajero/dashboard" class="btn btn-primary">
-            <i class="fas fa-arrow-left me-2"></i>Regresar al Dashboard
+            <i class="fas fa-arrow-left me-2"></i>Regresar al Panel
         </a>
     </div>
 </div>
