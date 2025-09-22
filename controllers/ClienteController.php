@@ -34,10 +34,7 @@ public function pedido() {
             }
         }
 
-        // Generar código único para el pedido
-        $codigo = 'PED' . date('YmdHis') . rand(100,999);
         $datosPedido = [
-            'codigo' => $codigo,
             'cliente_id' => null,
             'nombre_cliente' => $nombreCliente,
             'tipo' => $tipo,
@@ -49,11 +46,15 @@ public function pedido() {
         $pedido_id = $pedidoModel->crearPedido($datosPedido);
 
         if ($pedido_id) {
-            // Cambiar el estado del pedido a 'listo' para que el cajero lo vea
+            // ⚡ Código corto generado a partir del ID (no guardado en BD)
+            $codigoPedido = "NV-" . str_pad($pedido_id, 4, "0", STR_PAD_LEFT);
+
+            // Cambiar estado a 'listo' para que el cajero lo vea
             $pedidoModel->actualizarEstado($pedido_id, 'listo');
 
+            // Notificación para mesero
             $notificacionModel = $this->model('NotificacionModel');
-            $mensaje = "Nuevo pedido #{$pedido_id} - {$tipo} - Total: $" . number_format($total, 2);
+            $mensaje = "Nuevo pedido {$codigoPedido} - {$tipo} - Total: $" . number_format($total, 2);
             if ($nombreCliente) {
                 $mensaje .= " - Cliente: {$nombreCliente}";
             }

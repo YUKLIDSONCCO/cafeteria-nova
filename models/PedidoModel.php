@@ -11,34 +11,44 @@ class PedidoModel {
     }
 
     public function crearPedido($data) {
-    $db = $this->db;
+    try {
+        $this->db->beginTransaction();
 
-    $stmt = $db->prepare("INSERT INTO pedidos (codigo, cliente_id, nombre_cliente, tipo, total, estado) 
-                          VALUES (:codigo, :cliente_id, :nombre_cliente, :tipo, :total, 'creado')");
-    $stmt->bindParam(':codigo', $data['codigo']);
-    $stmt->bindParam(':cliente_id', $data['cliente_id']);
-    $stmt->bindParam(':nombre_cliente', $data['nombre_cliente']);
-    $stmt->bindParam(':tipo', $data['tipo']);
-    $stmt->bindParam(':total', $data['total']);
-    $stmt->execute();
+        // Insertar pedido principal
+        $stmt = $this->db->prepare("INSERT INTO pedidos (cliente_id, nombre_cliente, tipo, total, estado, creado_en) 
+                                    VALUES (:cliente_id, :nombre_cliente, :tipo, :total, 'creado', NOW())");
+        $stmt->bindParam(':cliente_id', $data['cliente_id']);
+        $stmt->bindParam(':nombre_cliente', $data['nombre_cliente']);
+        $stmt->bindParam(':tipo', $data['tipo']);
+        $stmt->bindParam(':total', $data['total']);
+        $stmt->execute();
 
-    $pedido_id = $db->lastInsertId();
+        // ✅ Ahora sí obtenemos el ID generado
+        $pedido_id = $this->db->lastInsertId();
 
-    // Insertar productos en detalle_pedido
-    foreach ($data['productos'] as $producto) {
-        $stmtDetalle = $db->prepare("INSERT INTO detalle_pedido (pedido_id, producto_id, cantidad, precio_unit) 
-                                     VALUES (:pedido_id, :producto_id, :cantidad, :precio_unit)");
-        $stmtDetalle->bindParam(':pedido_id', $pedido_id);
-        $stmtDetalle->bindParam(':producto_id', $producto['id']);
-        $stmtDetalle->bindParam(':cantidad', $producto['cantidad']);
-        $stmtDetalle->bindParam(':precio_unit', $producto['precio']);
-        $stmtDetalle->execute();
+        // Insertar productos en detalle_pedido
+        if (!empty($data['productos'])) {
+            $stmtDetalle = $this->db->prepare("INSERT INTO detalle_pedido (pedido_id, producto_id, cantidad, precio_unit) 
+                                               VALUES (:pedido_id, :producto_id, :cantidad, :precio_unit)");
+            foreach ($data['productos'] as $producto) {
+                $stmtDetalle->execute([
+                    ':pedido_id'   => $pedido_id,
+                    ':producto_id' => $producto['id'],
+                    ':cantidad'    => $producto['cantidad'],
+                    ':precio_unit' => $producto['precio']
+                ]);
+            }
+        }
+
+        $this->db->commit();
+        return $pedido_id;
+
+    } catch (PDOException $e) {
+        $this->db->rollBack();
+        error_log("Error en crearPedido: " . $e->getMessage());
+        return false;
     }
-
-    return $pedido_id;
 }
-
-
     private function agregarDetallePedido($pedido_id, $producto_id, $cantidad, $precio) {
         $query = "INSERT INTO detalle_pedido (pedido_id, producto_id, cantidad, precio_unit) 
                  VALUES (:pedido_id, :producto_id, :cantidad, :precio)";

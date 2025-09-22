@@ -112,63 +112,65 @@ class BaristaController extends BaseController {
         $this->redirect('barista/dashboard');
     }
     
-public function finalizarPreparacion($id) {
-    $pedidoModel = $this->model('PedidoModel');
-    
-    if ($pedidoModel->actualizarEstado($id, 'listo')) {
-        // Notificar al cajero o mesero según el tipo de pedido
-        $notificacionModel = $this->model('NotificacionModel');
-        $pedido = $pedidoModel->obtenerPedidoPorId($id);
-        $mensaje = "Pedido #{$pedido['codigo']} listo para entregar/pagar";
+    public function finalizarPreparacion($id) {
+        $pedidoModel = $this->model('PedidoModel');
         
-        if ($pedido['tipo'] === 'mesa') {
-            $notificacionModel->crear('pedido_listo', 'mesero', $mensaje, $id);
+        if ($pedidoModel->actualizarEstado($id, 'listo')) {
+            // Notificar al cajero o mesero según el tipo de pedido
+            $notificacionModel = $this->model('NotificacionModel');
+            $pedido = $pedidoModel->obtenerPedidoPorId($id);
+
+            // ⚡ Generar código en base al ID
+            $codigoPedido = "NV-" . str_pad($pedido['id'], 4, "0", STR_PAD_LEFT);
+
+            $mensaje = "Pedido {$codigoPedido} listo para entregar/pagar";
+            
+            if ($pedido['tipo'] === 'mesa') {
+                $notificacionModel->crear('pedido_listo', 'mesero', $mensaje, $id);
+            } else {
+                $notificacionModel->crear('pedido_listo', 'cajero', $mensaje, $id);
+            }
+
+            $_SESSION['success'] = 'Pedido listo para entregar';
         } else {
-            $notificacionModel->crear('pedido_listo', 'cajero', $mensaje, $id);
+            $_SESSION['error'] = 'Error al finalizar preparación';
         }
+        
+        $this->redirect('barista/dashboard');
+    }
 
-        $_SESSION['success'] = 'Pedido listo para entregar';
-    } else {
-        $_SESSION['error'] = 'Error al finalizar preparación';
+    public function obtenerPedidosJSON() {
+        if (!Sesion::tieneRol('barista')) {
+            header('HTTP/1.0 403 Forbidden');
+            echo json_encode(['error' => 'Acceso denegado']);
+            return;
+        }
+        
+        $pedidoModel = $this->model('PedidoModel');
+        
+        $pedidos_confirmados = $pedidoModel->obtenerPedidosPorEstado('confirmado');
+        $pedidos_preparacion = $pedidoModel->obtenerPedidosPorEstado('preparacion');
+        $pedidos_listos = $pedidoModel->obtenerPedidosPorEstado('listo');
+        
+        foreach ($pedidos_confirmados as &$pedido) {
+            $pedido['detalles'] = $pedidoModel->obtenerDetallesPedido($pedido['id']);
+        }
+        foreach ($pedidos_preparacion as &$pedido) {
+            $pedido['detalles'] = $pedidoModel->obtenerDetallesPedido($pedido['id']);
+        }
+        foreach ($pedidos_listos as &$pedido) {
+            $pedido['detalles'] = $pedidoModel->obtenerDetallesPedido($pedido['id']);
+        }
+        
+        $data = [
+            'pedidos_confirmados' => $pedidos_confirmados,
+            'pedidos_preparacion' => $pedidos_preparacion,
+            'pedidos_listos' => $pedidos_listos
+        ];
+        
+        header('Content-Type: application/json');
+        echo json_encode($data);
     }
-    
-    $this->redirect('barista/dashboard');
-}
-
-public function obtenerPedidosJSON() {
-    if (!Sesion::tieneRol('barista')) {
-        header('HTTP/1.0 403 Forbidden');
-        echo json_encode(['error' => 'Acceso denegado']);
-        return;
-    }
-    
-    $pedidoModel = $this->model('PedidoModel');
-    
-    // Obtener pedidos con sus detalles
-    $pedidos_confirmados = $pedidoModel->obtenerPedidosPorEstado('confirmado');
-    $pedidos_preparacion = $pedidoModel->obtenerPedidosPorEstado('preparacion');
-    $pedidos_listos = $pedidoModel->obtenerPedidosPorEstado('listo');
-    
-    // Agregar detalles de productos a cada pedido
-    foreach ($pedidos_confirmados as &$pedido) {
-        $pedido['detalles'] = $pedidoModel->obtenerDetallesPedido($pedido['id']);
-    }
-    foreach ($pedidos_preparacion as &$pedido) {
-        $pedido['detalles'] = $pedidoModel->obtenerDetallesPedido($pedido['id']);
-    }
-    foreach ($pedidos_listos as &$pedido) {
-        $pedido['detalles'] = $pedidoModel->obtenerDetallesPedido($pedido['id']);
-    }
-    
-    $data = [
-        'pedidos_confirmados' => $pedidos_confirmados,
-        'pedidos_preparacion' => $pedidos_preparacion,
-        'pedidos_listos' => $pedidos_listos
-    ];
-    
-    header('Content-Type: application/json');
-    echo json_encode($data);
-}
 
 }
 ?>

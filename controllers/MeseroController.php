@@ -39,7 +39,11 @@ class MeseroController extends BaseController {
             // Crear notificación
             $notificacionModel = $this->model('NotificacionModel');
             $pedido = $pedidoModel->obtenerPedidoPorId($id);
-            $mensaje = "Pedido #{$pedido['codigo']} confirmado - Listo para preparar";
+
+            // ⚡ Usar código corto en base al ID
+            $codigoPedido = "NV-" . str_pad($pedido['id'], 4, "0", STR_PAD_LEFT);
+
+            $mensaje = "Pedido {$codigoPedido} confirmado - Listo para preparar";
             $notificacionModel->crear('pedido_confirmado', 'barista', $mensaje, $id);
 
             $_SESSION['success'] = 'Pedido confirmado correctamente';
@@ -67,8 +71,6 @@ class MeseroController extends BaseController {
         exit;
     }
 }
-
-
 
     public function liberarMesa() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -126,6 +128,5 @@ class MeseroController extends BaseController {
     header("Location: " . BASE_URL . "mesero/dashboard");
     exit;
 }
-
 }
 ?>
