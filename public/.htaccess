@@ -1,8 +1,7 @@
 RewriteEngine On
 
-# Si la solicitud no es para un archivo existente
+# Excluir archivos AJAX del routing
 RewriteCond %{REQUEST_FILENAME} !-f
-# Si la solicitud no es para un directorio existente
 RewriteCond %{REQUEST_FILENAME} !-d
-# Redirigir todas las solicitudes a index.php
+RewriteCond %{REQUEST_URI} !\.(php|css|js|png|jpg|jpeg|gif|ico)$ [NC]
 RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
