@@ -23,27 +23,35 @@ class ClienteController extends BaseController {
     
 public function pedido() {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $productos = json_decode($_POST['productos'], true);
-        $tipo = $_POST['tipo'];
-        $nombreCliente = $_POST['nombre_cliente'] ?? null; // ← nuevo
+        $productos = isset($_POST['productos']) ? json_decode($_POST['productos'], true) : [];
+        $tipo = $_POST['tipo'] ?? '';
+        $nombreCliente = $_POST['nombre_cliente'] ?? null;
 
         $total = 0;
-        foreach ($productos as $producto) {
-            $total += $producto['precio'] * $producto['cantidad'];
+        if (is_array($productos)) {
+            foreach ($productos as $producto) {
+                $total += $producto['precio'] * $producto['cantidad'];
+            }
         }
 
+        // Generar código único para el pedido
+        $codigo = 'PED' . date('YmdHis') . rand(100,999);
         $datosPedido = [
+            'codigo' => $codigo,
             'cliente_id' => null,
-            'nombre_cliente' => $nombreCliente, // ← guardamos el nombre
+            'nombre_cliente' => $nombreCliente,
             'tipo' => $tipo,
             'total' => $total,
-            'productos' => $productos
+            'productos' => is_array($productos) ? $productos : []
         ];
 
         $pedidoModel = $this->model('PedidoModel');
         $pedido_id = $pedidoModel->crearPedido($datosPedido);
 
         if ($pedido_id) {
+            // Cambiar el estado del pedido a 'listo' para que el cajero lo vea
+            $pedidoModel->actualizarEstado($pedido_id, 'listo');
+
             $notificacionModel = $this->model('NotificacionModel');
             $mensaje = "Nuevo pedido #{$pedido_id} - {$tipo} - Total: $" . number_format($total, 2);
             if ($nombreCliente) {
