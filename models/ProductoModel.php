@@ -10,6 +10,23 @@ class ProductoModel {
         $this->db = $database->getConnection();
     }
 
+    public function obtenerCategoria($producto_id) {
+        try {
+            $query = "SELECT categoria FROM " . $this->table . " WHERE id = :id";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':id', $producto_id);
+            $stmt->execute();
+            
+            if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                return $row['categoria'];
+            }
+            return '';
+        } catch(PDOException $exception) {
+            error_log("Error en obtenerCategoria: " . $exception->getMessage());
+            return '';
+        }
+    }
+
     public function obtenerProductos() {
         try {
             $query = "SELECT * FROM " . $this->table . " WHERE disponible = 1 ORDER BY categoria, nombre";
