@@ -24,7 +24,7 @@
                     <?php foreach ($pedidos_confirmados as $pedido): ?>
                     <div class="card mb-2">
                         <div class="card-body">
-                            <h6>Pedido #<?php echo $pedido['codigo']; ?></h6>
+                            <h6>Pedido <?php echo "NV-" . str_pad($pedido['id'], 4, "0", STR_PAD_LEFT); ?></h6>
                             <?php if (!empty($pedido['productos_categorizados'])): ?>
                                 <!-- Bebidas -->
                                 <?php if (!empty($pedido['productos_categorizados']['bebidas'])): ?>
@@ -82,7 +82,7 @@
                     <?php foreach ($pedidos_preparacion as $pedido): ?>
                     <div class="card mb-2">
                         <div class="card-body">
-                            <h6>Pedido #<?php echo $pedido['codigo']; ?></h6>
+                            <h6>Pedido <?php echo "NV-" . str_pad($pedido['id'], 4, "0", STR_PAD_LEFT); ?></h6>
                             <?php if (!empty($pedido['productos_categorizados'])): ?>
                                 <!-- Bebidas -->
                                 <?php if (!empty($pedido['productos_categorizados']['bebidas'])): ?>
@@ -140,7 +140,7 @@
                     <?php foreach ($pedidos_listos as $pedido): ?>
                     <div class="card mb-2">
                         <div class="card-body">
-                            <h6>Pedido #<?php echo $pedido['codigo']; ?></h6>
+                            <h6>Pedido <?php echo "NV-" . str_pad($pedido['id'], 4, "0", STR_PAD_LEFT); ?></h6>
                             <?php if (!empty($pedido['productos_categorizados'])): ?>
                                 <!-- Bebidas -->
                                 <?php if (!empty($pedido['productos_categorizados']['bebidas'])): ?>

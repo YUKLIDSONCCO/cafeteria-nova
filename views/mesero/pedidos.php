@@ -14,7 +14,10 @@
             <div class="col-md-6 mb-3">
                 <div class="card">
                     <div class="card-body">
-                        <h5>Pedido <?php echo htmlspecialchars($pedido['codigo']); ?> <small class="text-muted">#<?php echo (int)$pedido['id']; ?></small></h5>
+                        <h5>
+                            Pedido <?php echo "NV-" . str_pad($pedido['id'], 4, "0", STR_PAD_LEFT); ?>
+                            <small class="text-muted">#<?php echo (int)$pedido['id']; ?></small>
+                        </h5>
                         <p><strong>Cliente:</strong> <?php echo htmlspecialchars($pedido['cliente_nombre'] ?? 'Cliente'); ?></p>
                         <p><strong>Tipo:</strong> <?php echo ucfirst($pedido['tipo']); ?></p>
                         <p><strong>Total:</strong> S/ <?php echo number_format($pedido['total'], 2); ?></p>

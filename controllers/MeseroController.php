@@ -34,20 +34,13 @@ class MeseroController extends BaseController {
 
     public function confirmarPedido($id) {
         $pedidoModel = $this->model('PedidoModel');
-        
         if ($pedidoModel->actualizarEstado($id, 'confirmado')) {
-            // Crear notificación
-            $notificacionModel = $this->model('NotificacionModel');
-            $pedido = $pedidoModel->obtenerPedidoPorId($id);
-
-            // ⚡ Usar código corto en base al ID
-            $codigoPedido = "NV-" . str_pad($pedido['id'], 4, "0", STR_PAD_LEFT);
-
-            $mensaje = "Pedido {$codigoPedido} confirmado - Listo para preparar";
-            $notificacionModel->crear('pedido_confirmado', 'barista', $mensaje, $id);
-
-            $_SESSION['success'] = 'Pedido confirmado correctamente';
-        } else {
+    $notificacionModel = $this->model('NotificacionModel');
+    $pedido = $pedidoModel->obtenerPedidoPorId($id);
+    $codigoPedido = "NV-" . str_pad($pedido['id'], 4, "0", STR_PAD_LEFT);
+    $mensaje = "Pedido {$codigoPedido} confirmado - Listo para preparar";
+    $notificacionModel->crear('pedido_confirmado', 'barista', $mensaje, $id);
+}else {
             $_SESSION['error'] = 'Error al confirmar el pedido';
         }
         

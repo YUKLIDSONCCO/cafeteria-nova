@@ -50,7 +50,7 @@ public function pedido() {
             $codigoPedido = "NV-" . str_pad($pedido_id, 4, "0", STR_PAD_LEFT);
 
             // Cambiar estado a 'listo' para que el cajero lo vea
-            $pedidoModel->actualizarEstado($pedido_id, 'listo');
+            //$pedidoModel->actualizarEstado($pedido_id, 'listo');
 
             // Notificación para mesero
             $notificacionModel = $this->model('NotificacionModel');

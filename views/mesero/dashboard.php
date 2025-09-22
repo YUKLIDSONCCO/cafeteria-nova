@@ -17,7 +17,7 @@
                     <?php foreach ($pedidos_pendientes as $pedido): ?>
                     <div class="card mb-2">
                         <div class="card-body">
-                            <h6>Pedido #<?php echo $pedido['codigo']; ?></h6>
+                            <h6>Pedido #<?php echo "NV-" . str_pad($pedido['id'], 4, "0", STR_PAD_LEFT); ?></h6>
                             <p>Total: $<?php echo number_format($pedido['total'], 2); ?></p>
                             <p>Tipo: <?php echo ucfirst($pedido['tipo']); ?></p>
                             <a href="<?php echo BASE_URL; ?>mesero/confirmarPedido/<?php echo $pedido['id']; ?>" 
@@ -33,56 +33,55 @@
     </div>
 
     <!-- Mesas -->
-<!-- Mesas -->
-<div class="col-md-6">
-    <div class="card">
-        <div class="card-header bg-info">
-            <h5>Estado de Mesas</h5>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <?php foreach ($mesas as $mesa): ?>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info">
+                <h5>Estado de Mesas</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <?php foreach ($mesas as $mesa): ?>
 
-                    <div class="col-md-6 mb-3">
-                        <div class="card 
-                            <?php echo $mesa['estado'] === 'libre' ? 'bg-success' : 'bg-danger'; ?> 
-                            text-white">
-                            <div class="card-body text-center">
-                                <h6>Mesa <?php echo $mesa['codigo']; ?></h6>
-                                <p><?php echo ucfirst($mesa['estado']); ?></p>
-                                <small>Cap: <?php echo $mesa['capacidad']; ?> pers.</small>
-                                <br>
+                        <div class="col-md-6 mb-3">
+                            <div class="card 
+                                <?php echo $mesa['estado'] === 'libre' ? 'bg-success' : 'bg-danger'; ?> 
+                                text-white">
+                                <div class="card-body text-center">
+                                    <h6>Mesa <?php echo $mesa['codigo']; ?></h6>
+                                    <p><?php echo ucfirst($mesa['estado']); ?></p>
+                                    <small>Cap: <?php echo $mesa['capacidad']; ?> pers.</small>
+                                    <br>
 
-                                <?php if ($mesa['estado'] === 'libre'): ?>
-                                    <!-- Formulario para asignar pedido -->
-                                    <form action="<?php echo BASE_URL; ?>mesero/asignarMesa" method="POST" class="mt-2">
-                                        <input type="hidden" name="mesa_id" value="<?php echo $mesa['id']; ?>">
-                                        
-                                        <select name="pedido_id" class="form-control form-control-sm mb-2" required>
-                                            <option value="">Seleccionar pedido</option>
-                                            <?php foreach ($pedidos_pendientes as $pedido): ?>
-                                                <option value="<?php echo $pedido['id']; ?>">
-                                                    Pedido #<?php echo $pedido['codigo']; ?> (S/ <?php echo number_format($pedido['total'], 2); ?>)
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
+                                    <?php if ($mesa['estado'] === 'libre'): ?>
+                                        <!-- Formulario para asignar pedido -->
+                                        <form action="<?php echo BASE_URL; ?>mesero/asignarMesa" method="POST" class="mt-2">
+                                            <input type="hidden" name="mesa_id" value="<?php echo $mesa['id']; ?>">
+                                            
+                                            <select name="pedido_id" class="form-control form-control-sm mb-2" required>
+                                                <option value="">Seleccionar pedido</option>
+                                                <?php foreach ($pedidos_pendientes as $pedido): ?>
+                                                    <option value="<?php echo $pedido['id']; ?>">
+                                                        Pedido #<?php echo "NV-" . str_pad($pedido['id'], 4, "0", STR_PAD_LEFT); ?> 
+                                                        (S/ <?php echo number_format($pedido['total'], 2); ?>)
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
 
-                                        <button type="submit" class="btn btn-light btn-sm">Asignar</button>
-                                    </form>
-                                <?php else: ?>
-                                    <!-- Botón Liberar -->
-                                    <form action="<?php echo BASE_URL; ?>mesero/liberarMesa" method="POST" class="mt-2">
-                                        <input type="hidden" name="mesa_id" value="<?php echo $mesa['id']; ?>">
-                                        <button type="submit" class="btn btn-dark btn-sm">Liberar</button>
-                                    </form>
-                                <?php endif; ?>
+                                            <button type="submit" class="btn btn-light btn-sm">Asignar</button>
+                                        </form>
+                                    <?php else: ?>
+                                        <!-- Botón Liberar -->
+                                        <form action="<?php echo BASE_URL; ?>mesero/liberarMesa" method="POST" class="mt-2">
+                                            <input type="hidden" name="mesa_id" value="<?php echo $mesa['id']; ?>">
+                                            <button type="submit" class="btn btn-dark btn-sm">Liberar</button>
+                                        </form>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                <?php endforeach; ?>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
 </div>
