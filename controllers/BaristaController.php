@@ -229,7 +229,7 @@ public function finalizarPreparacion($id) {
 }
 
 public function obtenerPedidosJSON() {
-    if (!Sesion::tieneRol('barista')) {
+    if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'barista') {
         header('HTTP/1.0 403 Forbidden');
         echo json_encode(['error' => 'Acceso denegado']);
         return;
@@ -237,20 +237,44 @@ public function obtenerPedidosJSON() {
     
     $pedidoModel = $this->model('PedidoModel');
     
-    // Obtener pedidos con sus detalles
-    $pedidos_confirmados = $pedidoModel->obtenerPedidosPorEstado('confirmado');
-    $pedidos_preparacion = $pedidoModel->obtenerPedidosPorEstado('preparacion');
-    $pedidos_listos = $pedidoModel->obtenerPedidosPorEstado('listo');
+    // Función auxiliar para categorizar los productos
+    $categorizarProductos = function($detalles) {
+        $bebidas = [];
+        $alimentos = [];
+        
+        foreach ($detalles as $detalle) {
+            if (strpos(strtolower($detalle['categoria']), 'bebida') !== false) {
+                $bebidas[] = $detalle;
+            } else {
+                $alimentos[] = $detalle;
+            }
+        }
+        
+        return [
+            'bebidas' => $bebidas,
+            'alimentos' => $alimentos
+        ];
+    };
     
-    // Agregar detalles de productos a cada pedido
+    // Obtener y categorizar pedidos confirmados
+    $pedidos_confirmados = $pedidoModel->obtenerPedidosPorEstado('confirmado');
     foreach ($pedidos_confirmados as &$pedido) {
-        $pedido['detalles'] = $pedidoModel->obtenerDetallesPedido($pedido['id']);
+        $detalles = $pedidoModel->obtenerDetallesPedido($pedido['id']);
+        $pedido['productos_categorizados'] = $categorizarProductos($detalles);
     }
+    
+    // Obtener y categorizar pedidos en preparación
+    $pedidos_preparacion = $pedidoModel->obtenerPedidosPorEstado('preparacion');
     foreach ($pedidos_preparacion as &$pedido) {
-        $pedido['detalles'] = $pedidoModel->obtenerDetallesPedido($pedido['id']);
+        $detalles = $pedidoModel->obtenerDetallesPedido($pedido['id']);
+        $pedido['productos_categorizados'] = $categorizarProductos($detalles);
     }
+    
+    // Obtener y categorizar pedidos listos
+    $pedidos_listos = $pedidoModel->obtenerPedidosPorEstado('listo');
     foreach ($pedidos_listos as &$pedido) {
-        $pedido['detalles'] = $pedidoModel->obtenerDetallesPedido($pedido['id']);
+        $detalles = $pedidoModel->obtenerDetallesPedido($pedido['id']);
+        $pedido['productos_categorizados'] = $categorizarProductos($detalles);
     }
     
     $data = [
@@ -261,6 +285,83 @@ public function obtenerPedidosJSON() {
     
     header('Content-Type: application/json');
     echo json_encode($data);
+}
+
+public function iniciarPreparacionAjax() {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+        return;
+    }
+    
+    if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'barista') {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Acceso denegado']);
+        return;
+    }
+    
+    $data = json_decode(file_get_contents('php://input'), true);
+    $id = $data['id'] ?? null;
+    
+    if (!$id) {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'ID no válido']);
+        return;
+    }
+    
+    $pedidoModel = $this->model('PedidoModel');
+    
+    if ($pedidoModel->actualizarEstado($id, 'preparacion')) {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'message' => 'Preparación iniciada']);
+    } else {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Error al iniciar preparación']);
+    }
+}
+
+public function finalizarPreparacionAjax() {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+        return;
+    }
+    
+    if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'barista') {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Acceso denegado']);
+        return;
+    }
+    
+    $data = json_decode(file_get_contents('php://input'), true);
+    $id = $data['id'] ?? null;
+    
+    if (!$id) {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'ID no válido']);
+        return;
+    }
+    
+    $pedidoModel = $this->model('PedidoModel');
+    
+    if ($pedidoModel->actualizarEstado($id, 'listo')) {
+        // Notificar al cajero o mesero según el tipo de pedido
+        $notificacionModel = $this->model('NotificacionModel');
+        $pedido = $pedidoModel->obtenerPedidoPorId($id);
+        $mensaje = "Pedido #{$pedido['codigo']} listo para entregar/pagar";
+        
+        if ($pedido['tipo'] === 'mesa') {
+            $notificacionModel->crear('pedido_listo', 'mesero', $mensaje, $id);
+        } else {
+            $notificacionModel->crear('pedido_listo', 'cajero', $mensaje, $id);
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'message' => 'Pedido listo para entregar']);
+    } else {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Error al finalizar preparación']);
+    }
 }
 
 }
