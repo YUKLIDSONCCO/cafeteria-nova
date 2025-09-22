@@ -74,6 +74,26 @@ class CajeroController extends BaseController {
             'fecha_fin' => $fecha_fin
         ]);
     }
+    
+    // MÉTODO NUEVO PARA MANEJAR SOLICITUDES AJAX
+public function reporteVentasAjax() {
+    $pedidoModel = $this->model('PedidoModel');
+    
+    // Usar los mismos parámetros que en el reporte principal
+    $fecha_inicio = $_GET['inicio'] ?? date('Y-m-d', strtotime('-6 days'));
+    $fecha_fin = $_GET['fin'] ?? date('Y-m-d');
+    
+    $reporte = $pedidoModel->obtenerReporteVentas($fecha_inicio, $fecha_fin);
+    
+    // Asegurarse de devolver un array siempre
+    if (!is_array($reporte)) {
+        $reporte = [];
+    }
+    
+    header('Content-Type: application/json');
+    echo json_encode($reporte);
+    exit;
+}
     // Cambiar estado de pago del pedido
     public function togglePago() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -89,5 +109,21 @@ class CajeroController extends BaseController {
         }
         $this->redirect('cajero/dashboard');
     }
+// Agrega este método ANTES del método togglePago()
+// ... otros métodos existentes ...
+
+public function pedidosPendientesAjax() {
+    $pedidoModel = $this->model('PedidoModel');
+    $pendientes = $pedidoModel->obtenerPedidosParaPago();
+    
+    header('Content-Type: application/json');
+    echo json_encode(is_array($pendientes) ? $pendientes : []);
+    exit;
+}
+
+public function index() {
+    // Redirigir al dashboard por defecto
+    $this->dashboard();
+}
 }
 ?>
