@@ -1,193 +1,113 @@
-<?php
-// Verificar si hay mensajes de éxito o error
-if (isset($_SESSION['mensaje'])) {
-    echo '<div class="alert alert-' . $_SESSION['mensaje_tipo'] . ' alert-dismissible fade show" role="alert">
-            ' . $_SESSION['mensaje'] . '
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>';
-    unset($_SESSION['mensaje']);
-    unset($_SESSION['mensaje_tipo']);
+<?php 
+// Verifica la ruta correcta del header
+$headerPath = dirname(__DIR__) . '/templates/header.php';
+if (file_exists($headerPath)) {
+    require_once $headerPath;
+} else {
+    // Fallback si no encuentra el header
+    echo '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Inventario - Admin</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"></head><body>';
 }
 ?>
 
 <div class="container mt-4">
     <div class="row">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2>Reporte de Ingredientes Faltantes</h2>
-                <div>
-                    <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#agregarProductoModal">
-                        <i class="fas fa-plus"></i> Agregar Producto
-                    </button>
-                    <a href="<?php echo BASE_URL; ?>barista/dashboard" class="btn btn-primary">
-                        <i class="fas fa-arrow-left"></i> Volver al Dashboard
-                    </a>
-                </div>
-            </div>
-
-            <!-- Modal para agregar producto -->
-            <div class="modal fade" id="agregarProductoModal" tabindex="-1" aria-labelledby="agregarProductoModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="agregarProductoModalLabel">Agregar Nuevo Producto</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="col-md-12">
+            <a href="<?php echo BASE_URL; ?>barista/dashboard" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+            </a>
+            <h2 class="mb-4"><?php echo $titulo; ?></h2>
+                    
+            <!-- Resumen del inventario -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card bg-warning text-dark">
+                        <div class="card-body text-center">
+                            <h5>Productos con Stock Bajo</h5>
+                            <h3><?php echo count($productos_bajos); ?></h3>
                         </div>
-                        <form action="<?php echo BASE_URL; ?>barista/agregarProducto" method="POST">
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label for="nombre" class="form-label">Nombre del Producto</label>
-                                    <input type="text" class="form-control" id="nombre" name="nombre" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="tipo" class="form-label">Tipo</label>
-                                    <select class="form-control" id="tipo" name="tipo" required>
-                                        <option value="ingrediente">Ingrediente</option>
-                                        <option value="producto">Producto Final</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="stock" class="form-label">Stock Inicial</label>
-                                    <input type="number" step="0.01" class="form-control" id="stock" name="stock" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="stock_minimo" class="form-label">Stock Mínimo</label>
-                                    <input type="number" step="0.01" class="form-control" id="stock_minimo" name="stock_minimo" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="unidad_medida" class="form-label">Unidad de Medida</label>
-                                    <select class="form-control" id="unidad_medida" name="unidad_medida" required>
-                                        <option value="unidades">Unidades</option>
-                                        <option value="gramos">Gramos</option>
-                                        <option value="ml">Mililitros</option>
-                                        <option value="kg">Kilogramos</option>
-                                        <option value="litros">Litros</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="precio" class="form-label">Precio (opcional)</label>
-                                    <input type="number" step="0.01" class="form-control" id="precio" name="precio">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="categoria" class="form-label">Categoría (opcional)</label>
-                                    <select class="form-control" id="categoria" name="categoria">
-                                        <option value="">Seleccionar categoría</option>
-                                        <?php if (!empty($categorias)): ?>
-                                            <?php foreach ($categorias as $categoria): ?>
-                                                <option value="<?php echo htmlspecialchars($categoria['nombre']); ?>">
-                                                    <?php echo htmlspecialchars($categoria['nombre']); ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        <?php endif; ?>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="descripcion" class="form-label">Descripción (opcional)</label>
-                                    <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="submit" class="btn btn-primary">Guardar Producto</button>
-                            </div>
-                        </form>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-info text-white">
+                        <div class="card-body text-center">
+                            <h5>Total de Productos</h5>
+                            <h3><?php echo count($inventario); ?></h3>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+            
+            <!-- Alertas de stock bajo -->
+            <?php if (!empty($productos_bajos)): ?>
+            <div class="alert alert-warning mb-4">
+                <h5 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Alertas de Stock Bajo</h5>
+                <div class="row">
+                    <?php foreach ($productos_bajos as $producto): ?>
+                    <div class="col-md-4 mb-2">
+                        <strong><?php echo htmlspecialchars($producto['producto']); ?></strong>: 
+                        Stock: <?php echo $producto['cantidad_actual']; ?> 
+                        (Mínimo: <?php echo $producto['minimo']; ?>)
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
 
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow">
+            <!-- Tabla de inventario -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Productos en Inventario</h5>
+                </div>
                 <div class="card-body">
-                    <?php if (!empty($ingredientes)): ?>
-                        <div class="row">
-                            <!-- Columna de Bebidas -->
-                            <div class="col-md-6 border-end">
-                                <h4 class="mb-3 text-primary">Bebidas</h4>
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead class="table-primary">
-                                            <tr>
-                                                <th>Producto</th>
-                                                <th>Stock Actual</th>
-                                                <th>Stock Mínimo</th>
-                                                <th>Estado</th>
-                                                <th>Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($ingredientes as $ingrediente): 
-                                                if (strpos(strtolower($ingrediente['categoria']), 'bebida') !== false): ?>
-                                                <tr class="<?php echo $ingrediente['stock'] <= $ingrediente['stock_minimo'] ? 'table-danger' : ''; ?>">
-                                                    <td><?php echo htmlspecialchars($ingrediente['nombre']); ?></td>
-                                                    <td><?php echo $ingrediente['stock']; ?></td>
-                                                    <td><?php echo $ingrediente['stock_minimo']; ?></td>
-                                                    <td>
-                                                        <?php if ($ingrediente['stock'] <= $ingrediente['stock_minimo']): ?>
-                                                            <span class="badge bg-danger">Faltante</span>
-                                                        <?php else: ?>
-                                                            <span class="badge bg-success">OK</span>
-                                                        <?php endif; ?>
-                                                    </td>
-                                                    <td>
-                                                        <button class="btn btn-sm btn-warning marcar-faltante" 
-                                                                data-id="<?php echo $ingrediente['id']; ?>"
-                                                                data-nombre="<?php echo htmlspecialchars($ingrediente['nombre']); ?>">
-                                                            <i class="fas fa-exclamation-triangle"></i> Marcar Faltante
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            <?php endif; endforeach; ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <!-- Columna de Alimentos -->
-                            <div class="col-md-6">
-                                <h4 class="mb-3 text-success">Alimentos</h4>
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead class="table-success">
-                                            <tr>
-                                                <th>Producto</th>
-                                                <th>Stock Actual</th>
-                                                <th>Stock Mínimo</th>
-                                                <th>Estado</th>
-                                                <th>Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($ingredientes as $ingrediente): 
-                                                if (strpos(strtolower($ingrediente['categoria']), 'bebida') === false): ?>
-                                                <tr class="<?php echo $ingrediente['stock'] <= $ingrediente['stock_minimo'] ? 'table-danger' : ''; ?>">
-                                                    <td><?php echo htmlspecialchars($ingrediente['nombre']); ?></td>
-                                                    <td><?php echo $ingrediente['stock']; ?></td>
-                                                    <td><?php echo $ingrediente['stock_minimo']; ?></td>
-                                                    <td>
-                                                        <?php if ($ingrediente['stock'] <= $ingrediente['stock_minimo']): ?>
-                                                            <span class="badge bg-danger">Faltante</span>
-                                                        <?php else: ?>
-                                                            <span class="badge bg-success">OK</span>
-                                                        <?php endif; ?>
-                                                    </td>
-                                                    <td>
-                                                        <button class="btn btn-sm btn-warning marcar-faltante" 
-                                                                data-id="<?php echo $ingrediente['id']; ?>"
-                                                                data-nombre="<?php echo htmlspecialchars($ingrediente['nombre']); ?>">
-                                                            <i class="fas fa-exclamation-triangle"></i> Marcar Faltante
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            <?php endif; endforeach; ?>
+                    <?php if (!empty($inventario)): ?>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Stock Actual</th>
+                                        <th>Stock Mínimo</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($inventario as $item): ?>
+                                        <tr class="<?php echo $item['cantidad_actual'] <= $item['minimo'] ? 'table-warning' : ''; ?>">
+                                            <td>
+                                                <strong><?php echo htmlspecialchars($item['producto']); ?></strong>
+                                                <?php if (!empty($item['categoria'])): ?>
+                                                    <br><small class="text-muted"><?php echo htmlspecialchars($item['categoria']); ?></small>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td><?php echo $item['cantidad_actual']; ?></td>
+                                            <td><?php echo $item['minimo']; ?></td>
+                                            <td>
+                                                <?php if ($item['cantidad_actual'] <= $item['minimo']): ?>
+                                                    <span class="badge bg-warning">Stock Bajo</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-success">Normal</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-primary btn-sm" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#editarStockModal"
+                                                        data-id="<?php echo $item['id']; ?>"
+                                                        data-producto="<?php echo htmlspecialchars($item['producto']); ?>"
+                                                        data-cantidad="<?php echo $item['cantidad_actual']; ?>"
+                                                        data-minimo="<?php echo $item['minimo']; ?>">
+                                                    <i class="fas fa-edit"></i> Editar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
                                 </tbody>
                             </table>
                         </div>
                     <?php else: ?>
                         <div class="alert alert-info">
-                            No hay ingredientes registrados en el sistema.
+                            No hay productos en el inventario.
                         </div>
                     <?php endif; ?>
                 </div>
@@ -196,19 +116,93 @@ if (isset($_SESSION['mensaje'])) {
     </div>
 </div>
 
+<!-- Modal para editar stock -->
+<div class="modal fade" id="editarStockModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST">
+                <input type="hidden" name="action" value="actualizar">
+                <input type="hidden" name="producto_id" id="editProductoId">
+                
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Stock</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Producto</label>
+                        <input type="text" class="form-control" id="editProductoNombre" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Stock Actual</label>
+                        <input type="number" class="form-control" name="cantidad_actual" id="editCantidad" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Stock Mínimo</label>
+                        <input type="number" class="form-control" name="minimo" id="editMinimo" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para agregar producto -->
+<div class="modal fade" id="agregarProductoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST">
+                <input type="hidden" name="action" value="agregar">
+                
+                <div class="modal-header">
+                    <h5 class="modal-title">Agregar Producto al Inventario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del Producto</label>
+                        <input type="text" class="form-control" name="producto" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar Producto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
+// Script para el modal de edición
 document.addEventListener('DOMContentLoaded', function() {
-    const botonesMarcar = document.querySelectorAll('.marcar-faltante');
-    
-    botonesMarcar.forEach(boton => {
-        boton.addEventListener('click', function() {
-            const id = this.getAttribute('data-id');
-            const nombre = this.getAttribute('data-nombre');
-            
-            if (confirm(`¿Estás seguro de marcar ${nombre} como faltante?`)) {
-                window.location.href = `<?php echo BASE_URL; ?>barista/marcarFaltante/${id}`;
-            }
-        });
+    const editModal = document.getElementById('editarStockModal');
+    editModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const id = button.getAttribute('data-id');
+        const producto = button.getAttribute('data-producto');
+        const cantidad = button.getAttribute('data-cantidad');
+        const minimo = button.getAttribute('data-minimo');
+        
+        document.getElementById('editProductoId').value = id;
+        document.getElementById('editProductoNombre').value = producto;
+        document.getElementById('editCantidad').value = cantidad;
+        document.getElementById('editMinimo').value = minimo;
     });
 });
 </script>
+
+<?php 
+// Verifica la ruta correcta del footer
+$footerPath = dirname(__DIR__) . '/templates/footer.php';
+if (file_exists($footerPath)) {
+    require_once $footerPath;
+} else {
+    // Fallback si no encuentra el footer
+    echo '<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script></body></html>';
+}
+?>
